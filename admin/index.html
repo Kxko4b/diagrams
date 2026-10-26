@@ -3359,6 +3359,12 @@
     </div>
 
     <div class="more-tool-grid">
+        <button class="more-tool-card" type="button" onclick="if (window.KxkoNative && typeof window.KxkoNative.openCyclingQuiz === 'function') { window.KxkoNative.openCyclingQuiz(); } else { alert('The Cycling Quiz is available in the Kxko Android app.'); }">
+            <span class="more-tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="18" r="3"/><circle cx="19" cy="18" r="3"/><path d="m5 18 5-9h4l5 9M8 13h7m-4-4-2-3H6"/></svg></span>
+            <strong>Cycling Quiz</strong>
+            <span>Listen to your saved upcoming test questions and answer with your watch's media buttons.</span>
+            <b>Start learning <span aria-hidden="true">→</span></b>
+        </button>
         <button class="more-tool-card" type="button" onclick="showAdminView('overview')">
             <span class="more-tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/><rect x="3" y="14" width="8" height="7" rx="1"/></svg></span>
             <strong>Dashboard overview</strong>

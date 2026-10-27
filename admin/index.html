@@ -3353,6 +3353,38 @@
         </div>
     </section>
 
+    <section class="more-preferences" aria-labelledby="briefing-settings-title">
+        <div class="more-section-title">
+            <div><span class="more-eyebrow">AUTOMATION</span><h3 id="briefing-settings-title">Daily briefing settings</h3></div>
+            <span class="more-section-note">SAVED TO SUPABASE</span>
+        </div>
+        <div id="briefing-settings-panel" class="exam-preferences">
+            <label class="exam-preference-row" for="briefing-run-time">
+                <span><strong>Weekday briefing time</strong><small>Time is in Germany (Europe/Berlin). The full briefing push runs Monday to Friday.</small></span>
+                <input id="briefing-run-time" type="time" value="06:05" class="exam-preference-select">
+            </label>
+            <label class="exam-preference-row" for="briefing-enabled">
+                <span><strong>Scheduled briefing</strong><small>Turn off the scheduled full briefing without deleting your settings.</small></span>
+                <input id="briefing-enabled" type="checkbox" checked>
+            </label>
+            <label class="exam-preference-row" for="briefing-sound-mode">
+                <span><strong>Notification sound</strong><small>Loud uses your Android notification-channel sound; silent requests no sound.</small></span>
+                <select id="briefing-sound-mode" class="exam-preference-select">
+                    <option value="loud">Loud</option>
+                    <option value="silent">Silent</option>
+                </select>
+            </label>
+            <label class="exam-preference-row" for="briefing-vibration">
+                <span><strong>Vibration</strong><small>Allow vibration for briefing notifications.</small></span>
+                <input id="briefing-vibration" type="checkbox" checked>
+            </label>
+            <div class="save-row">
+                <button id="briefing-settings-save" class="primary" type="button">Save briefing settings</button>
+                <p id="briefing-settings-status" class="muted" role="status">Open More to load your saved settings.</p>
+            </div>
+        </div>
+    </section>
+
     <div class="more-section-title">
         <div><span class="more-eyebrow">QUICK ACCESS</span><h3>Tools &amp; shortcuts</h3></div>
         <span class="more-section-note">YOUR WORKSPACE</span>
@@ -3531,7 +3563,8 @@
 
 <!-- JAVASCRIPT -->
 
-<script src="../js/content-admin.js?v=20261020b"></script>
+<script src="../js/content-admin.js?v=20261027a"></script>
+<script src="../js/briefing-settings-admin.js?v=20261027a"></script>
 <script src="../js/admin.js?v=20261021f"></script>
 <script src="../js/questions-admin.js?v=20261020b"></script>
 <script src="../js/earnings-admin.js?v=20261021d"></script>
@@ -3681,6 +3714,7 @@
         const title = document.querySelector(".header-title");
         if (title) title.textContent = ({overview:"Overview",weather:"Weather",briefing:"Briefing",business:"Business",more:"More",requests:"Business / Requests",questions:"Business / Questions",reviews:"Business / Reviews",examples:"Business / Examples",content:"Business / Website content",kxkos:"More / KXKOS"})[actualView] || "Kxko Admin";
         if (actualView === "more" && typeof loadMoreAccount === "function") loadMoreAccount();
+        if (actualView === "more" && typeof window.loadBriefingSettings === "function") window.loadBriefingSettings();
         window.scrollTo({top:0,behavior:"smooth"});
         if (actualView === "briefing" && typeof loadLiveBriefing === "function") loadLiveBriefing();
     }

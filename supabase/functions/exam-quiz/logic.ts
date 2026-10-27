@@ -52,18 +52,22 @@ export function validateQuestions(raw: any): Question[] {
   return out;
 }
 
-export function buildPrompt(subject: string, topics: string): { system: string; user: string } {
-  const system = [
-    "You write revision questions for a German school student (class 10, Realschule/Gesamtschule level).",
-    "Use ONLY the topic notes the student gives you. Never add facts that are not in the notes.",
-    "Write in the same language as the notes (German notes -> German questions, Spanish vocabulary -> Spanish/German as in the notes).",
-    "Return ONLY valid JSON with exactly this shape:",
-    '{"cover":[{"front":"question or term","back":"answer"}],',
-    ' "match":[{"pairs":[{"term":"...","match":"..."}]}],',
-    ' "choice":[{"question":"...","options":["...","...","...","..."],"answer":0,"explain":"one short sentence"}]}',
-    "Give 10 cover cards, 2 match sets (5 pairs each, every term and every match unique), and 8 choice questions with 4 options.",
-    "answer is the 0-based index of the correct option. Keep everything short.",
-  ].join("\n");
+const RULES = [
+  "You write revision questions for a German school student (class 10, Realschule/Gesamtschule level).",
+  "Use ONLY the topic notes the student gives you. Never add facts that are not in the notes.",
+  "Write in the same language as the notes (German notes -> German questions, Spanish vocabulary -> Spanish/German as in the notes).",
+  "Return ONLY valid JSON, no explanations, in exactly the shape below. Keep everything short.",
+];
+
+/** Three small prompts instead of one big one: they run in parallel, so a slow model finishes sooner. */
+export function buildPrompts(subject: string, topics: string): Array<{ part: "cover" | "match" | "choice"; system: string; user: string }> {
   const user = `Subject: ${subject}\n\nTopic notes:\n${topics.slice(0, 6000)}`;
-  return { system, user };
+  const shapes = {
+    cover: ['{"cover":[{"front":"question or term","back":"answer"}]}', "Give 10 cards."],
+    match: ['{"match":[{"pairs":[{"term":"...","match":"..."}]}]}', "Give 2 sets of 5 pairs. Every term and every match must be unique."],
+    choice: ['{"choice":[{"question":"...","options":["...","...","...","..."],"answer":0,"explain":"one short sentence"}]}', "Give 8 questions with 4 options each. answer is the 0-based index of the correct option."],
+  } as const;
+  return (Object.keys(shapes) as Array<keyof typeof shapes>).map((part) => ({
+    part, user, system: [...RULES, "Shape: " + shapes[part][0], shapes[part][1]].join("\n"),
+  }));
 }

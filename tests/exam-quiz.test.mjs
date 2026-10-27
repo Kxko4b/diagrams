@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { extractJson, validateQuestions, buildPrompt } from "../supabase/functions/exam-quiz/logic.ts";
+import { extractJson, validateQuestions, buildPrompts } from "../supabase/functions/exam-quiz/logic.ts";
 
 test("extractJson handles fences and chatter", () => {
   assert.deepEqual(extractJson('```json\n{"a":1}\n```'), { a: 1 });
@@ -35,11 +35,15 @@ test("validateQuestions removes duplicate questions and survives junk", () => {
   assert.equal(q.length, 1);
 });
 
-test("prompt contains only the given notes and caps their length", () => {
-  const p = buildPrompt("Chemie", "x".repeat(9000));
-  assert.ok(p.user.includes("Chemie"));
-  assert.ok(p.user.length < 6100);
-  assert.ok(p.system.includes("ONLY the topic notes"));
+test("prompts: three small parts, only the given notes, capped length", () => {
+  const ps = buildPrompts("Chemie", "x".repeat(9000));
+  assert.deepEqual(ps.map((p) => p.part), ["cover", "match", "choice"]);
+  for (const p of ps) {
+    assert.ok(p.user.includes("Chemie"));
+    assert.ok(p.user.length < 6100);
+    assert.ok(p.system.includes("ONLY the topic notes"));
+  }
+  assert.ok(ps[1].system.includes('"match"') && !ps[1].system.includes('"choice"'));
 });
 
 import { daysUntil, examsToPing, buildPingText } from "../supabase/functions/exam-ping/logic.ts";

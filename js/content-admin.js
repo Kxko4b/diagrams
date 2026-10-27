@@ -1,55 +1,60 @@
 const SITE_COPY_FIELDS = ["about", "terms"];
 
-async function loadSiteContentAdmin() {
+function setContentMessage(text, tone = "") {
   const message = document.getElementById("content-message");
-  const { data, error } = await db.from("site_content").select("section, content");
-  if (error) {
-    console.error("Could not load website copy:", error);
-    message.textContent = "Could not load website copy.";
-    return;
-  }
+  if (!message) return;
+  message.textContent = text;
+  message.dataset.tone = tone;
+}
 
-  for (const item of data || []) {
-    if (SITE_COPY_FIELDS.includes(item.section)) {
-      document.getElementById(`content-${item.section}`).value = item.content || "";
+async function loadSiteContentAdmin() {
+  setContentMessage("Loading website copy…");
+  try {
+    const { data, error } = await db
+      .from("site_content")
+      .select("section, content")
+      .in("section", SITE_COPY_FIELDS);
+    if (error) throw error;
+
+    for (const section of SITE_COPY_FIELDS) {
+      const field = document.getElementById(`content-${section}`);
+      if (!field) continue;
+      const row = (data || []).find(item => item.section === section);
+      field.value = row?.content || "";
     }
+    setContentMessage("Loaded. Changes are only published after you save.");
+  } catch (error) {
+    console.error("Could not load website copy:", error);
+    setContentMessage(`Could not load website copy: ${error?.message || "Unknown database error"}`, "error");
   }
-  message.textContent = "Website copy loaded. Use ## for headings, **text** for bold, - for lists, and /br for a line break.";
 }
 
 document.getElementById("content-save")?.addEventListener("click", async (event) => {
   const button = event.currentTarget;
-  const message = document.getElementById("content-message");
+  if (button.dataset.saving === "true") return;
+  button.dataset.saving = "true";
   button.disabled = true;
-  message.textContent = "Saving…";
+  setContentMessage("Saving website copy…");
 
-  for (const section of SITE_COPY_FIELDS) {
-    const value = document.getElementById(`content-${section}`).value.trim();
-    const { data, error: lookupError } = await db
-      .from("site_content")
-      .select("section")
-      .eq("section", section)
-      .maybeSingle();
+  try {
+    for (const section of SITE_COPY_FIELDS) {
+      const field = document.getElementById(`content-${section}`);
+      if (!field) throw new Error(`Missing editor for ${section}`);
+      const value = field.value;
 
-    if (lookupError) {
-      console.error("Could not find website copy row:", lookupError);
-      message.textContent = "Could not save website copy. Please try again.";
-      button.disabled = false;
-      return;
+      // Upsert avoids the previous select-then-update flow and handles missing rows.
+      const { error } = await db
+        .from("site_content")
+        .upsert({ section, content: value, updated_at: new Date().toISOString() }, { onConflict: "section" });
+      if (error) throw error;
     }
-
-    const result = data
-      ? await db.from("site_content").update({ content: value }).eq("section", section)
-      : await db.from("site_content").insert({ section, content: value });
-
-    if (result.error) {
-      console.error("Could not save website copy:", result.error);
-      message.textContent = "Could not save website copy. Please try again.";
-      button.disabled = false;
-      return;
-    }
+    setContentMessage("Saved successfully. Your public website will show the updated copy after refresh.", "success");
+  } catch (error) {
+    console.error("Could not save website copy:", error);
+    const message = error?.message || "Unknown database error";
+    setContentMessage(`Save failed: ${message}. Check that you're signed in with the admin account.`, "error");
+  } finally {
+    button.disabled = false;
+    delete button.dataset.saving;
   }
-
-  button.disabled = false;
-  message.textContent = "Website copy saved.";
 });

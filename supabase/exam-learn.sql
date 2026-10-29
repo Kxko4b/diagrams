@@ -35,3 +35,9 @@ create table public.exam_questions (
 --   exam-ping-evening    0 20 * * *   .../functions/v1/exam-ping?slot=evening
 --
 -- Briefing jobs after the 2026-10-25 clock change (winter time): briefing-early 0 5, briefing-full 0 6, untis-watch */10 5-6, all Mon-Fri UTC.
+
+-- Quiz voice (Cycling Quiz in the Android app), added 2026-10-28:
+--   public.is_owner()  boolean, true only for the owner's login (same email rule as the other owner-only policies).
+--   quiz-voice edge function (verify_jwt true): owner only; turns text into lively AI speech (WAV).
+--     Uses OPENAI_TTS_KEY (real OpenAI key) if set, otherwise OpenRouter openai/gpt-audio-mini with the OpenRouter key
+--     (OpenRouter needs at least $0.50 credit for audio). Any failure -> 503 and the app uses the phone's own voice.

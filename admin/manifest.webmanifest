@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Kxko Daily Briefing",
+  "short_name": "Kxko Briefing",
+  "description": "Kxko Daily Briefing admin dashboard",
+  "start_url": "./?source=homescreen",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#202321",
+  "theme_color": "#202321",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

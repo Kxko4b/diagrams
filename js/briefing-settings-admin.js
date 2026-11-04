@@ -121,7 +121,7 @@
     if (button.dataset.saving === "true") return;
     const seen = new Set();
     for (const item of schedules) {
-      if (!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(item.run_time)) {
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(item.run_time)) {
         status("Choose a valid time for every briefing.", "error");
         return;
       }

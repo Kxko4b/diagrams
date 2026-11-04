@@ -396,17 +396,30 @@ async function getFirebaseAccessToken(): Promise<string> {
   if (!data.access_token) throw new Error("Google did not return an access token");
   return data.access_token;
 }
-async function sendFCM(message: string): Promise<void> {
+async function sendFCM(message: string, preferences: { sound_mode?: string; vibration_enabled?: boolean } = {}): Promise<void> {
   const projectId = Deno.env.get("FIREBASE_PROJECT_ID");
   if (!projectId) throw new Error("Missing FIREBASE_PROJECT_ID");
   const accessToken = await getFirebaseAccessToken();
   const response = await fetchT(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`, {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ message: { topic: "Kxko-Daily-Briefing", notification: { title: "Kxko Daily Briefing", body: message } } }),
+    body: JSON.stringify({ message: { topic: "Kxko-Daily-Briefing", data: { title: "Kxko Daily Briefing", body: message, sound_mode: preferences.sound_mode === "silent" ? "silent" : "loud", vibration_enabled: String(preferences.vibration_enabled !== false) } } }),
   });
   const text = await response.text();
   if (!response.ok) throw new Error(`FCM returned HTTP ${response.status}: ${text}`);
+}
+
+async function getScheduleNotificationSettings(scheduleId: string | null): Promise<{ sound_mode: string; vibration_enabled: boolean }> {
+  const fallback = { sound_mode: "loud", vibration_enabled: true };
+  if (!scheduleId) return fallback;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!serviceKey) throw new Error("Missing Supabase service role key");
+  const endpoint = SUPABASE_URL + "/rest/v1/briefing_schedules?id=eq." + encodeURIComponent(scheduleId) + "&select=sound_mode,vibration_enabled&limit=1";
+  const response = await fetchT(endpoint, { headers: { apikey: serviceKey, Authorization: "Bearer " + serviceKey } });
+  if (!response.ok) throw new Error("Could not load briefing notification settings: HTTP " + response.status);
+  const rows = await response.json();
+  if (!Array.isArray(rows) || !rows.length) throw new Error("The scheduled briefing settings no longer exist");
+  return { sound_mode: rows[0].sound_mode === "silent" ? "silent" : "loud", vibration_enabled: rows[0].vibration_enabled !== false };
 }
 
 /* COMPONENT RUNNER
@@ -532,6 +545,7 @@ Deno.serve(async (req) => {
     const requestedDate = url.searchParams.get("date");
     const targetDate = requestedDate ? parseDate(requestedDate) : new Date();
     const targetDateKey = requestedDate ?? dateKey(targetDate);
+    const notificationSettings = await getScheduleNotificationSettings(url.searchParams.get("schedule_id"));
     if (url.searchParams.get("mode") === "untis-watch") return await untisWatch(targetDateKey);
 
     const [untisResult, calendarResult, weatherResult, examsResult, requestResult] = await Promise.all([
@@ -569,7 +583,7 @@ Deno.serve(async (req) => {
       { supabaseUrl: SUPABASE_URL, serviceKey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") }, targetDateKey, briefing);
     const push = duplicatePush
       ? { ok: true, attempts: 0, recovered: false, firstError: undefined, error: undefined }
-      : await withRetry(() => sendFCM(briefing), { attempts: 3, delayMs: 1500, isRetryable: isSafePushRetry });
+      : await withRetry(() => sendFCM(briefing, notificationSettings), { attempts: 3, delayMs: 1500, isRetryable: isSafePushRetry });
     let fcmResult: any = push.ok
       ? { name: "firebase-fcm", success: true, attempts: push.attempts, recovered: push.recovered, firstError: push.firstError, skipped: duplicatePush || undefined }
       : { name: "firebase-fcm", success: false, error: push.error, attempts: push.attempts };
@@ -600,7 +614,7 @@ Deno.serve(async (req) => {
           });
           if (gate.allowed) {
             const shortened = truncateToBytes(briefing, 1800);
-            const retry = await withRetry(() => sendFCM(shortened.text), { attempts: 1 });
+            const retry = await withRetry(() => sendFCM(shortened.text, notificationSettings), { attempts: 1 });
             if (retry.ok) {
               briefing = shortened.text;
               fcmResult = { name: "firebase-fcm", success: true, attempts: (push.attempts ?? 1) + 1, recovered: true, firstError: push.error };

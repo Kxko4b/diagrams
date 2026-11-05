@@ -3137,6 +3137,77 @@
         }
 </style>
 
+
+<style id="kxko-graphite-refresh">
+    :root {
+        color-scheme: dark;
+        --bg: #151617;
+        --surface: #202224;
+        --surface-soft: #292c2f;
+        --surface-raised: #303437;
+        --text: #e7e9ea;
+        --muted: #b9bec1;
+        --border: rgb(215 219 221 / 12%);
+        --input-border: rgb(215 219 221 / 20%);
+        --primary: #b85e2e;
+        --primary-dark: #93451f;
+        --primary-soft: #34251f;
+        --brass: #b85e2e;
+        --brass-soft: #34251f;
+        --signal: #c66b3b;
+        --signal-soft: #34251f;
+        --sidebar: #191b1d;
+        --sidebar-raised: #24272a;
+        --sidebar-text: #e7e9ea;
+        --sidebar-muted: #aeb4b7;
+        --shadow: none;
+        --radius: 10px;
+        --radius-small: 7px;
+        --display: "IBM Plex Sans", Arial, sans-serif;
+        --body: "IBM Plex Sans", Arial, sans-serif;
+    }
+    html, body { background: var(--bg) !important; color: var(--text); }
+    .sidebar { background: var(--sidebar) !important; border-color: var(--border) !important; box-shadow: none !important; }
+    .nav-button { border-radius: 8px !important; }
+    .nav-button.active { background: var(--brass-soft) !important; border-color: rgb(184 94 46 / 24%) !important; box-shadow: inset 3px 0 0 var(--brass) !important; color: var(--text) !important; }
+    .nav-button.active .nav-icon, .nav-icon, .quick-action-icon svg { color: #d7dbdd !important; }
+    .dashboard-header { background: #191b1d !important; border-color: var(--border) !important; backdrop-filter: none !important; }
+    .section-card, .stat-card, .request-card, .admin-question-card, .admin-review-card,
+    .weather-card, .overview-weather, .business-tile, .briefing-weather-shortcut,
+    .briefing-live-stat, #briefing-detail.section-card {
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+    }
+    .overview-weather:hover, .business-tile:hover, .briefing-weather-shortcut:hover,
+    .stat-card:hover, .quick-action:hover { transform: none !important; box-shadow: none !important; }
+    .brand-icon, .app-info-mark, .login-logo { background: var(--brass) !important; color: #fff !important; box-shadow: none !important; }
+    .primary, button.primary, .chip.active {
+        background: var(--brass) !important;
+        border-color: var(--brass) !important;
+        color: #fff !important;
+        box-shadow: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    .primary:hover { background: #ca7040 !important; border-color: #ca7040 !important; transform: none !important; }
+    input, textarea, select, .login-box input {
+        background: #191b1d !important;
+        color: var(--text) !important;
+        border-color: var(--input-border) !important;
+        border-radius: 8px !important;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--brass) !important; box-shadow: 0 0 0 2px rgb(184 94 46 / 16%) !important; }
+    .quick-action-icon { background: var(--surface-soft) !important; border-color: var(--border) !important; color: #d7dbdd !important; }
+    .weather-symbol, .overview-weather-icon { color: #d7dbdd !important; }
+    .status-dot { box-shadow: none !important; }
+    .section-card h2, .section-card h3, .stat-card strong { color: var(--text); }
+    .sidebar, .dashboard-header, .section-card, .stat-card, .request-card { backdrop-filter: none !important; }
+    @media (max-width: 760px) {
+        .sidebar { background: #191b1d !important; border-radius: 0 !important; box-shadow: none !important; }
+    }
+</style>
 </head>
 
 <body>

@@ -78,10 +78,6 @@
   };
 
   el("add")?.addEventListener("click", () => {
-    if (schedules.length >= 12) {
-      status("You can schedule up to 12 briefing times.", "error");
-      return;
-    }
     schedules.push({ id: makeId(), run_time: "", enabled: true, sound_mode: "loud", vibration_enabled: true });
     renderSchedules();
     const last = el("list")?.lastElementChild?.querySelector('input[type="time"]');

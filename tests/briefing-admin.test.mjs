@@ -154,6 +154,12 @@ test("the migration is additive, owner-only and read-only for the browser", () =
   assert.doesNotMatch(sql, /to anon/);
 });
 
+test("briefing schedule editor has no fixed 12-time limit", () => {
+  const source = readFileSync(new URL("../js/briefing-settings-admin.js", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /schedules\.length\s*>=\s*12/);
+  assert.doesNotMatch(source, /up to 12 briefing times/i);
+});
+
 /* ---- homework window + yellow substitute rows ---- */
 import { createRequire as __cr } from "node:module";
 {

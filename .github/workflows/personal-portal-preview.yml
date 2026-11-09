@@ -35,6 +35,9 @@ jobs:
           node --check js/feature-registry.js
           node --check js/supabase.js
 
+      - name: Test personal accounts and privacy boundaries
+        run: node --test tests/personalisation.test.mjs
+
       - name: Check required personal portal UI hooks
         run: |
           node <<'NODE'

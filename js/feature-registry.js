@@ -4,7 +4,7 @@ window.KxkoFeatureRegistry = Object.freeze([
   {id:"webuntis",name:"WebUntis",description:"Connect your school account",group:"school",defaultEnabled:false,available:false},
   {id:"timetable",name:"Timetable",description:"Lessons, rooms and substitutions",group:"school",defaultEnabled:false,available:false},
   {id:"homework",name:"Homework",description:"Tasks and upcoming deadlines",group:"school",defaultEnabled:false,available:false},
-  {id:"calendar",name:"Calendar",description:"Your connected calendar events",group:"daily",defaultEnabled:false,available:false},
+  {id:"calendar",name:"Calendar",description:"Your upcoming Google Calendar events",group:"daily",defaultEnabled:false,available:true},
   {id:"briefing",name:"Daily Briefing",description:"A scheduled personal summary",group:"daily",defaultEnabled:true,available:false},
   {id:"cycling",name:"Cycling",description:"Ride tracking and live statistics",group:"activity",defaultEnabled:false,available:false},
   {id:"cycling_history",name:"Cycling history",description:"Past rides and route summaries",group:"activity",defaultEnabled:false,available:false},

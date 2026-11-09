@@ -1,7 +1,7 @@
 /* Central catalogue for optional personal modules. Keep presentation and persistence keyed by stable IDs. */
 window.KxkoFeatureRegistry = Object.freeze([
   {id:"weather",name:"Weather",description:"Local conditions and forecasts",group:"daily",defaultEnabled:true,available:true},
-  {id:"webuntis",name:"WebUntis",description:"Connect your school account",group:"school",defaultEnabled:false,available:false},
+  {id:"webuntis",name:"WebUntis",description:"Official personal school sign-in (school activation required)",group:"school",defaultEnabled:false,available:false},
   {id:"timetable",name:"Timetable",description:"Lessons, rooms and substitutions",group:"school",defaultEnabled:false,available:false},
   {id:"homework",name:"Homework",description:"Tasks and upcoming deadlines",group:"school",defaultEnabled:false,available:false},
   {id:"calendar",name:"Calendar",description:"Your upcoming Google Calendar events",group:"daily",defaultEnabled:false,available:true},

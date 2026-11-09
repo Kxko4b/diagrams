@@ -28,16 +28,16 @@ alter table public.user_modules enable row level security;
 
 drop policy if exists "Users manage own profile" on public.user_profiles;
 create policy "Users manage own profile" on public.user_profiles
-  for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 drop policy if exists "Users manage own preferences" on public.user_preferences;
 create policy "Users manage own preferences" on public.user_preferences
-  for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 drop policy if exists "Users manage own modules" on public.user_modules;
 create policy "Users manage own modules" on public.user_modules
-  for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 
 create or replace function public.bootstrap_briefing_user()
-returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
+returns trigger language plpgsql security definer set search_path = '' as $
 begin
   insert into public.user_profiles(user_id, display_name)
   values (new.id, coalesce(new.raw_user_meta_data->>'full_name',''))
@@ -71,3 +71,5 @@ create trigger user_modules_updated_at before update on public.user_modules
 for each row execute procedure public.touch_briefing_updated_at();
 
 grant select, insert, update, delete on public.user_profiles, public.user_preferences, public.user_modules to authenticated;
+
+revoke all on function public.bootstrap_briefing_user() from public, anon, authenticated;

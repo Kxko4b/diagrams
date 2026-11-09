@@ -690,6 +690,51 @@ function escapeHTML(value) {
 
 
 /* =========================================================
+   LIVE REVIEW UPDATES
+   Refresh the admin review cards and overview count as soon as
+   Supabase records a review insert, edit, or deletion.
+========================================================= */
+
+let reviewRealtimeChannel = null;
+
+function startReviewRealtime() {
+    if (reviewRealtimeChannel) return;
+
+    reviewRealtimeChannel = db
+        .channel("kxko-admin-reviews-live")
+        .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "reviews" },
+            async () => {
+                if (dashboardIsHidden()) return;
+
+                if (typeof loadOverviewStats === "function") {
+                    await loadOverviewStats();
+                }
+
+                const activeView = (document.querySelector(".view.active")?.id || "")
+                    .replace(/-view$/, "");
+                const editingReview = Boolean(
+                    document.querySelector("#admin-reviews input:focus, #admin-reviews textarea:focus, #admin-reviews select:focus")
+                );
+
+                // Never replace a review card while its fields are being edited.
+                if (activeView === "reviews" && !editingReview
+                    && typeof loadAdminReviews === "function") {
+                    await loadAdminReviews();
+                }
+            }
+        )
+        .subscribe((status) => {
+            if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                console.warn("Live review updates are temporarily unavailable:", status);
+            }
+        });
+}
+
+startReviewRealtime();
+
+/* =========================================================
    START
 ========================================================= */
 

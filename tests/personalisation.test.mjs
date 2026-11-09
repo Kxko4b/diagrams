@@ -77,6 +77,12 @@ test("personal homework is isolated from administrator homework", () => {
   assert.match(auth, /delete\(\)/);
 });
 
+test("personal homework grants only the CRUD permissions it needs", () => {
+  const migration = read("supabase/migrations/20261109215712_personal_homework_least_privilege.sql");
+  assert.match(migration, /revoke all on public\.personal_homework from anon, public, authenticated/);
+  assert.match(migration, /grant select, insert, update, delete on public\.personal_homework to authenticated/);
+});
+
 test("homework can be switched on independently of WebUntis", () => {
   assert.match(registry, /id:"homework".*available:true/);
   assert.match(registry, /id:"webuntis".*available:false/);

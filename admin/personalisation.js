@@ -30,7 +30,7 @@
     $("login-button")?.insertAdjacentElement("afterend", actions);
     $("login-button").textContent = "Sign in";
     $("login-button").addEventListener("click", async (event) => {
-      event.preventDefault();
+      event.preventDefault(); event.stopImmediatePropagation();
       const email = $("admin-email").value.trim(), password = $("admin-password").value;
       setAuthMessage("");
       if (!email || !password) return setAuthMessage("Enter your email and password.");
@@ -77,7 +77,7 @@
     root.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPanel(b.dataset.go)));
     $("personal-signout").addEventListener("click",async()=>{await db.auth.signOut();location.reload();});
     $("setup-back").addEventListener("click",()=>renderStep(Math.max(0,step-1)));
-    $("setup-next").addEventListener("click",()=>step===7?finishSetup():renderStep(Math.min(7,step+1)));
+    $("setup-next").addEventListener("click",()=>{captureStep(step);step===7?finishSetup():renderStep(Math.min(7,step+1));});
     $("setup-skip").addEventListener("click",finishSetup);
     $("save-features").addEventListener("click",saveFeatures);
     $("save-settings").addEventListener("click",saveSettings);
@@ -117,6 +117,12 @@
     ["Daily Briefing","Choose the information you want in your daily summary.","<p>Start with weather and the briefing module. You can adjust sections and delivery schedules later.</p>"],
     ["Your modules","Enable the features you want to see.","<div id='wizard-modules'></div>"]
   ];
+  function captureStep(n){
+    if(n===1&&$("wizard-name"))profile.display_name=$("wizard-name").value.trim();
+    if(n===2&&$("wizard-theme")){prefs.theme=$("wizard-theme").value;prefs.accent=$("wizard-accent").value;}
+    if(n===3&&$("wizard-location"))prefs.location=$("wizard-location").value.trim()||"Buseck";
+    if(n===7)$("wizard-modules")?.querySelectorAll("[data-module]").forEach(c=>c.checked?enabled.add(c.dataset.module):enabled.delete(c.dataset.module));
+  }
   function renderStep(n){
     step=n;const s=steps[n];$("setup-step-label").textContent=String(n+1).padStart(2,"0")+" / 08";$("setup-progress-fill").style.width=((n+1)/8*100)+"%";$("setup-title").textContent=s[0];$("setup-description").textContent=s[1];$("setup-fields").innerHTML=s[2];$("setup-back").disabled=n===0;$("setup-next").textContent=n===7?"Finish setup →":"Continue →";
     if(n===1)$("wizard-name").value=profile.display_name||currentUser.user_metadata?.full_name||"";
@@ -125,14 +131,11 @@
     if(n===7){$("wizard-modules").innerHTML=MODULES.filter(x=>x[0]!=="business").map(x=>'<label class="personal-feature-row"><span><b>'+x[1]+'</b><small>'+x[2]+'</small></span><input type="checkbox" data-module="'+x[0]+'" '+(enabled.has(x[0])?'checked':'')+'></label>').join("");}
   }
   async function finishSetup(){
-    if(step===1&&$("wizard-name"))profile.display_name=$("wizard-name").value.trim();
-    if(step===2&&$("wizard-theme")){prefs.theme=$("wizard-theme").value;prefs.accent=$("wizard-accent").value;}
-    if(step===3&&$("wizard-location"))prefs.location=$("wizard-location").value.trim()||"Buseck";
-    if(step===7){$("wizard-modules")?.querySelectorAll("[data-module]").forEach(c=>c.checked?enabled.add(c.dataset.module):enabled.delete(c.dataset.module));}
+    captureStep(step);
     const p=await db.from("user_profiles").upsert({user_id:currentUser.id,display_name:profile.display_name||"",onboarding_completed:true},{onConflict:"user_id"});
     const q=await db.from("user_preferences").upsert({user_id:currentUser.id,preferences:prefs},{onConflict:"user_id"});
     if(p.error||q.error){$("setup-description").textContent="Couldn't save your setup: "+(p.error||q.error).message;return;}
-    await saveFeatures(false);profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
+    await Promise.all(MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x[0],enabled:enabled.has(x[0])},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
   }
   function renderFeatureList(){
     $("personal-feature-list").innerHTML=MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x[1]+'</b><small>'+x[2]+'</small></span><input type="checkbox" data-module="'+x[0]+'" '+(enabled.has(x[0])?'checked':'')+'></label>').join("");

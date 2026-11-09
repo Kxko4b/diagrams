@@ -6,6 +6,7 @@ on:
     paths:
       - "admin/**"
       - "js/**"
+      - "supabase/migrations/**"
       - "css/**"
       - "tests/personalisation.test.mjs"
       - "index.html"

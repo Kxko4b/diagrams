@@ -96,3 +96,23 @@ grant execute on function public.personal_google_consume_state(text) to service_
 grant execute on function public.personal_google_store_connection(uuid,text,text,text) to service_role;
 grant execute on function public.personal_google_get_refresh_token(uuid) to service_role;
 grant execute on function public.personal_google_disconnect(uuid) to service_role;
+
+-- Delete each user's Vault refresh token even when their Auth account is removed
+-- outside the self-service Edge Function (e.g. from the Supabase dashboard).
+create or replace function public.cleanup_personal_google_calendar_secret()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare v_secret_id uuid;
+begin
+  select vault_secret_id into v_secret_id
+  from public.personal_google_calendar_connections where user_id = old.id;
+  if v_secret_id is not null then
+    delete from vault.secrets where id = v_secret_id;
+  end if;
+  return old;
+end;
+$$;
+revoke all on function public.cleanup_personal_google_calendar_secret() from public, anon, authenticated;
+drop trigger if exists cleanup_personal_google_calendar_secret on auth.users;
+create trigger cleanup_personal_google_calendar_secret
+before delete on auth.users
+for each row execute function public.cleanup_personal_google_calendar_secret();

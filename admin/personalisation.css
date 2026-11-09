@@ -76,3 +76,12 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 .personal-connection-state.connected{background:rgba(104,160,119,.16);color:#8fc69b}
 .personal-connection-state.pending{background:var(--kx-panel2);color:var(--kx-muted)}
 @media(max-width:650px){.personal-connection-list{grid-template-columns:1fr}}
+
+.personal-app[data-density="compact"] .personal-card{padding:18px;border-radius:15px}
+.personal-app[data-density="compact"] .personal-shell{gap:28px}
+.personal-app[data-density="compact"] .personal-summary-grid{gap:12px;margin-top:24px}
+.personal-app[data-density="compact"] .personal-tab{padding:9px 12px}
+.personal-app button:focus-visible,.personal-app input:focus-visible,.personal-app select:focus-visible{outline:2px solid var(--kx-accent);outline-offset:3px}
+.personal-app button:disabled{opacity:.55;cursor:not-allowed}
+.personal-app .personal-tab{cursor:pointer}
+@media(prefers-reduced-motion:reduce){.personal-app *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}

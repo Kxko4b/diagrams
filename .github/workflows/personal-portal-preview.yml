@@ -49,7 +49,8 @@ jobs:
           const required = [
             'personal-app', 'personal-signup', 'personal-briefing-content',
             'personal-weather-content', 'personal-calendar-content',
-            'personal-signout', 'personal-feature-list', 'personal-settings',\n            'personal-homework-form', 'personal-homework-list'
+            'personal-signout', 'personal-feature-list', 'personal-settings',
+            'personal-homework-form', 'personal-homework-list'
           ];
           const missing = required.filter(id => !html.includes(id) && !js.includes(id));
           if (missing.length) {

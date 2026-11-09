@@ -1,19 +1,7 @@
 /* Kxko Briefing personal accounts. Admin access remains on the existing allow-list. */
 (() => {
   "use strict";
-  const MODULES = [
-    ["weather","Weather","Local conditions and forecasts"],
-    ["webuntis","WebUntis","Connect your school account"],
-    ["timetable","Timetable","Lessons, rooms and substitutions"],
-    ["homework","Homework","Tasks and upcoming deadlines"],
-    ["calendar","Calendar","Your connected calendar events"],
-    ["briefing","Daily Briefing","A scheduled personal summary"],
-    ["cycling","Cycling","Ride tracking and live statistics"],
-    ["cycling_history","Cycling history","Past rides and route summaries"],
-    ["business","Business tools","Requests, reviews and site administration"],
-    ["notifications","Notifications","Alerts and delivery preferences"]
-  ];
-  const $ = (id) => document.getElementById(id);
+  const MODULES = window.KxkoFeatureRegistry || [];  const $ = (id) => document.getElementById(id);
   const isAdmin = (user) => user?.email?.toLowerCase() === "haleannson@gmail.com";
   let currentUser = null, prefs = {}, profile = {}, enabled = new Set(), step = 0;
 

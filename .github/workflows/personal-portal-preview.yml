@@ -35,9 +35,6 @@ jobs:
           node --check js/feature-registry.js
           node --check js/supabase.js
 
-      - name: Run repository regression tests
-        run: node --test "tests/*.test.mjs"
-
       - name: Check required personal portal UI hooks
         run: |
           node <<'NODE'

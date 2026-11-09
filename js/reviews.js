@@ -256,5 +256,24 @@ document.getElementById("review-form")?.addEventListener("submit", async (event)
 
 window.loadReviews = loadReviews;
 loadReviews();
+
+// Update the public review cards immediately when a review or its media changes.
+const publicReviewRealtime = db
+  .channel("kxko-public-reviews-live")
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "reviews" },
+    () => loadReviews()
+  )
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "review-images" },
+    () => loadReviews()
+  )
+  .subscribe((status) => {
+    if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+      console.warn("Live website reviews are temporarily unavailable:", status);
+    }
+  });
 })();
 

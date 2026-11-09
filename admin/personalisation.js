@@ -113,8 +113,8 @@
     ["Your profile","What should we call you?","<label>Preferred name<input id='wizard-name' maxlength='80' placeholder='Your name'></label>"],
     ["Appearance","Choose a look that feels right.","<label>Theme<select id='wizard-theme'><option value='dark'>Dark</option><option value='light'>Light</option><option value='system'>Use device setting</option></select></label><label>Accent<select id='wizard-accent'><option value='amber'>Warm amber</option><option value='terracotta'>Terracotta</option><option value='sage'>Sage green</option><option value='violet'>Soft violet</option></select></label>"],
     ["Weather","Where should we look for your forecast?","<label>Location<input id='wizard-location' placeholder='Town or city' value='Buseck'></label><p>Weather alerts can be configured later. No location permission is required.</p>"],
-    ["School / WebUntis","Connect your school account later from Integrations.","<p>WebUntis is optional. You can use the app without connecting it.</p>"],
-    ["Calendar","Bring your schedule together when you're ready.","<p>Google Calendar connection is optional and can be completed later.</p>"],
+    ["School / WebUntis","Personal WebUntis access is not available yet.","<p>The existing administrator timetable is private and will not be shared with personal accounts. Do not enter your school password here.</p>"],
+    ["Calendar","Personal Google Calendar connection is not available yet.","<p>The administrator calendar remains private. A separate, secure Google sign-in flow is required before personal accounts can connect.</p>"],
     ["Daily Briefing","Choose the information you want in your daily summary.","<p>Start with weather and the briefing module. You can adjust sections and delivery schedules later.</p>"],
     ["Your modules","Enable the features you want to see.","<div id='wizard-modules'></div>"]
   ];

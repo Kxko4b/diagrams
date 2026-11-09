@@ -85,3 +85,12 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 .personal-app button:disabled{opacity:.55;cursor:not-allowed}
 .personal-app .personal-tab{cursor:pointer}
 @media(prefers-reduced-motion:reduce){.personal-app *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.personal-google-card{grid-column:1/-1}
+.personal-google-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.personal-google-list{border-top:1px solid var(--kx-line);margin-top:10px;padding-top:12px}
+.personal-google-list-heading{font-size:12px;font-weight:700;color:var(--kx-muted);text-transform:uppercase;letter-spacing:.08em}
+.personal-google-list ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.personal-google-list li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;background:var(--kx-panel2);border-radius:9px;font-size:13px}
+.personal-google-list li small{font-size:10px;color:var(--kx-muted);text-transform:uppercase;letter-spacing:.06em}
+.personal-google-card .personal-status{margin:2px 0}

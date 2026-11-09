@@ -1,0 +1,63 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+const read = (path) => readFileSync(new URL("../" + path, import.meta.url), "utf8");
+const html = read("admin/index.html");
+const auth = read("admin/personalisation.js");
+const registry = read("js/feature-registry.js");
+const accounts = read("supabase/migrations/20261109211926_personal_briefing_accounts.sql");
+const google = read("supabase/functions/personal-google-calendar/index.ts");
+const client = read("js/supabase.js");
+
+test("personal login offers account creation and password recovery", () => {
+  assert.match(html, /id="admin-email"/);
+  assert.match(html, /id="admin-password"/);
+  assert.match(auth, /id = "personal-signup"/);
+  assert.match(auth, /db\.auth\.signUp\(\{email,password,options:\{data:\{full_name\}\}\}\)/);
+  assert.match(auth, /resetPasswordForEmail/);
+  assert.match(auth, /password\.length < 8/);
+});
+
+test("personal accounts open a separate portal and load only their own records", () => {
+  assert.match(auth, /root\.id="personal-app"/);
+  assert.match(auth, /\$\("personal-app"\)\.classList\.remove\("hidden"\)/);
+  for (const table of ["user_profiles", "user_preferences", "user_modules"]) {
+    assert.match(auth, new RegExp('db\\.from\\("' + table + '"\\)'));
+  }
+  assert.match(auth, /\.eq\("user_id",user\.id\)/);
+});
+
+test("new accounts receive a profile, preferences and default module rows", () => {
+  for (const table of ["user_profiles", "user_preferences", "user_modules"]) {
+    assert.match(accounts, new RegExp("create table if not exists public\\." + table));
+  }
+  assert.match(accounts, /after insert on auth\.users/);
+  assert.match(accounts, /bootstrap_briefing_user/);
+  assert.equal((accounts.match(/enable row level security/g) || []).length, 3);
+  assert.equal((accounts.match(/\(select auth\.uid\(\)\) = user_id/g) || []).length, 6);
+});
+
+test("the feature catalogue distinguishes available modules from future integrations", () => {
+  assert.match(registry, /id:"weather".*available:true/);
+  assert.match(registry, /id:"calendar".*available:true/);
+  assert.match(registry, /id:"webuntis".*available:false/);
+  assert.match(registry, /id:"timetable".*available:false/);
+  assert.match(registry, /id:"homework".*available:false/);
+});
+
+test("Google refresh tokens stay server-side and personal data is user-scoped", () => {
+  assert.match(google, /p_refresh_token: tokens\.refresh_token/);
+  assert.match(google, /personal_google_store_connection/);
+  assert.match(google, /\.eq\("user_id", user\.id\)/);
+  assert.match(google, /calendar\.readonly/);
+  assert.doesNotMatch(google, /return json\(\{[^}]*refresh_token/s);
+  assert.doesNotMatch(client, /service_role/i);
+});
+
+test("personal portal has accessible status regions and account controls", () => {
+  assert.match(auth, /id="personal-signout"/);
+  assert.match(auth, /id="delete-account"/);
+  assert.match(auth, /role="status"/);
+  assert.match(auth, /role="alert"/);
+});

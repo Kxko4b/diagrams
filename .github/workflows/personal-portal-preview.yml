@@ -1,0 +1,80 @@
+name: Personal portal preview
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "admin/**"
+      - "js/**"
+      - "css/**"
+      - "index.html"
+      - "*.js"
+      - ".github/workflows/personal-portal-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-package:
+    name: Validate and package PR preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate personal portal JavaScript
+        run: |
+          node --check admin/personalisation.js
+          node --check js/feature-registry.js
+          node --check js/supabase.js
+
+      - name: Check required personal portal UI hooks
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const html = fs.readFileSync('admin/index.html', 'utf8');
+          const js = fs.readFileSync('admin/personalisation.js', 'utf8');
+          const required = [
+            'personal-app', 'personal-signup', 'personal-briefing-content',
+            'personal-weather-content', 'personal-calendar-content',
+            'personal-signout', 'personal-feature-list', 'personal-settings'
+          ];
+          const missing = required.filter(id => !html.includes(id) && !js.includes(id));
+          if (missing.length) {
+            console.error('Missing portal hooks:', missing.join(', '));
+            process.exit(1);
+          }
+          console.log('Personal portal hooks verified:', required.join(', '));
+          NODE
+
+      - name: Package website preview
+        run: |
+          mkdir -p preview
+          git ls-files -z | tar --null -T - -czf preview/kxko-briefing-pr-preview.tar.gz
+          {
+            echo "## Kxko Briefing PR preview"
+            echo ""
+            echo "The website snapshot for this pull request is attached as the **kxko-briefing-pr-preview** artifact."
+            echo "Download it from this workflow run's Artifacts section and extract it to inspect the exact PR version."
+            echo ""
+            echo "### Checks"
+            echo "- Personal portal JavaScript syntax"
+            echo "- Required personal portal UI hooks"
+            echo ""
+            echo "This artifact is a local preview snapshot, not a production deployment."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload PR website snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: kxko-briefing-pr-preview
+          path: preview/kxko-briefing-pr-preview.tar.gz
+          if-no-files-found: error
+          retention-days: 14

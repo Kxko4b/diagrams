@@ -123,25 +123,25 @@
     if(n===1)$("wizard-name").value=profile.display_name||currentUser.user_metadata?.full_name||"";
     if(n===2){$("wizard-theme").value=prefs.theme||"dark";$("wizard-accent").value=prefs.accent||"amber";}
     if(n===3)$("wizard-location").value=prefs.location||"Buseck";
-    if(n===7){$("wizard-modules").innerHTML=MODULES.filter(x=>x[0]!=="business").map(x=>'<label class="personal-feature-row"><span><b>'+x[1]+'</b><small>'+x[2]+'</small></span><input type="checkbox" data-module="'+x[0]+'" '+(enabled.has(x[0])?'checked':'')+'></label>').join("");}
+    if(n===7){$("wizard-modules").innerHTML=MODULES.filter(x=>x.id!=="business").map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");}
   }
   async function finishSetup(){
     captureStep(step);
     const p=await db.from("user_profiles").upsert({user_id:currentUser.id,display_name:profile.display_name||"",onboarding_completed:true},{onConflict:"user_id"});
     const q=await db.from("user_preferences").upsert({user_id:currentUser.id,preferences:prefs},{onConflict:"user_id"});
     if(p.error||q.error){$("setup-description").textContent="Couldn't save your setup: "+(p.error||q.error).message;return;}
-    await Promise.all(MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x[0],enabled:enabled.has(x[0])},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
+    await Promise.all(MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
   }
   function renderFeatureList(){
-    $("personal-feature-list").innerHTML=MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x[1]+'</b><small>'+x[2]+'</small></span><input type="checkbox" data-module="'+x[0]+'" '+(enabled.has(x[0])?'checked':'')+'></label>').join("");
+    $("personal-feature-list").innerHTML=MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");
   }
   function renderModuleSummary(){
-    $("personal-module-summary").innerHTML=MODULES.filter(x=>enabled.has(x[0])).map(x=>'<span>'+x[1]+'</span>').join("")||"<p>No modules enabled yet.</p>";
+    $("personal-module-summary").innerHTML=MODULES.filter(x=>enabled.has(x.id)).map(x=>'<span>'+x.name+'</span>').join("")||"<p>No modules enabled yet.</p>";
   }
   async function saveFeatures(showMessage=true){
     const rows=[...document.querySelectorAll("#personal-feature-list [data-module]")];
     rows.forEach(c=>c.checked?enabled.add(c.dataset.module):enabled.delete(c.dataset.module));
-    const result=await Promise.all(MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x[0],enabled:enabled.has(x[0])},{onConflict:"user_id,module_key"})));
+    const result=await Promise.all(MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const error=result.find(x=>x.error)?.error;
     $("feature-status").textContent=error?"Couldn't save: "+error.message:"Features saved. Disabled modules keep their data.";
     renderModuleSummary();if(showMessage)showPanel("features");

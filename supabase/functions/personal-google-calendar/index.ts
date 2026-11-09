@@ -194,5 +194,41 @@ Deno.serve(async (req: Request) => {
     }, 200, origin);
   }
 
+  if (body.action === "events") {
+    const { data: refreshToken, error: tokenError } = await admin.rpc("personal_google_get_refresh_token", { p_user_id: user.id });
+    if (tokenError || !refreshToken) return json({ error: "Connect Google Calendar first." }, 404, origin);
+    const refreshResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ client_id: googleClientId, client_secret: googleClientSecret, refresh_token: refreshToken, grant_type: "refresh_token" }),
+    });
+    const refreshed = await refreshResponse.json();
+    if (!refreshResponse.ok || !refreshed.access_token) {
+      console.error("Google access-token refresh failed", refreshed.error || refreshResponse.status);
+      return json({ error: "Google needs you to reconnect this account." }, 409, origin);
+    }
+    const timeMin = new Date();
+    const timeMax = new Date(timeMin.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const query = new URLSearchParams({
+      timeMin: timeMin.toISOString(), timeMax: timeMax.toISOString(),
+      singleEvents: "true", orderBy: "startTime", maxResults: "50",
+    });
+    const eventResponse = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events?" + query.toString(), {
+      headers: { Authorization: "Bearer " + refreshed.access_token },
+    });
+    const result = await eventResponse.json();
+    if (!eventResponse.ok) {
+      console.error("Google events list failed", result.error?.status || eventResponse.status);
+      return json({ error: "Google could not return your upcoming events." }, 502, origin);
+    }
+    const events = (result.items ?? []).filter((item: Record<string, unknown>) => item.status !== "cancelled").map((item: Record<string, any>) => ({
+      id: item.id, summary: item.summary || "Untitled event",
+      start: item.start?.dateTime || item.start?.date || null,
+      end: item.end?.dateTime || item.end?.date || null,
+      allDay: !item.start?.dateTime, location: item.location || null,
+      htmlLink: item.htmlLink || null,
+    }));
+    return json({ events }, 200, origin);
+  }
+
   return json({ error: "Unknown action." }, 400, origin);
 });

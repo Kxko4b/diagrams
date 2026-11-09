@@ -103,3 +103,8 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 .personal-event-main span,.personal-event-main small{font-size:12px;color:var(--kx-muted)}
 .personal-upcoming-list a{color:var(--kx-accent);font-size:12px;font-weight:700;text-decoration:none;flex:none}
 .personal-upcoming-list a:hover{text-decoration:underline}
+
+.personal-untis-card{grid-column:1/-1}
+.personal-untis-note{padding:11px 13px;border-left:3px solid var(--kx-accent);background:var(--kx-panel2);border-radius:0 9px 9px 0;font-size:12px;line-height:1.6}
+.personal-help-link{display:inline-flex;align-items:center;gap:5px;color:var(--kx-accent);font-size:12px;font-weight:700;text-decoration:none}
+.personal-help-link:hover{text-decoration:underline}

@@ -191,7 +191,8 @@
       const response=await fetch(url);if(!response.ok)throw new Error("Forecast service unavailable.");
       const data=await response.json(),now=data.current,days=data.daily;
       const rows=days.time.map((day,i)=>'<div class="personal-forecast-day"><span>'+new Date(day+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short"})+'</span><span>'+weatherDescription(days.weather_code[i])+'</span><b>'+Math.round(days.temperature_2m_max[i])+'° / '+Math.round(days.temperature_2m_min[i])+'°</b></div>').join("");
-      panel.innerHTML='<div class="personal-weather-now"><strong>'+Math.round(now.temperature_2m)+'°</strong><div><b>'+weatherDescription(now.weather_code)+'</b><span>Feels like '+Math.round(now.apparent_temperature)+'° · '+Math.round(now.relative_humidity_2m)+'% humidity</span></div></div><div class="personal-weather-meta"><span>Wind '+Math.round(now.wind_speed_10m)+' km/h</span><span>Rain '+now.precipitation+' mm</span></div><div class="personal-forecast-list">'+rows+'</div><small class="personal-weather-source">Forecast by Open-Meteo · '+place.name+(place.country?", "+place.country:"")+'</small>';
+      $("personal-weather-place").textContent=place.name+(place.country?", "+place.country:"");
+      panel.innerHTML='<div class="personal-weather-now"><strong>'+Math.round(now.temperature_2m)+'°</strong><div><b>'+weatherDescription(now.weather_code)+'</b><span>Feels like '+Math.round(now.apparent_temperature)+'° · '+Math.round(now.relative_humidity_2m)+'% humidity</span></div></div><div class="personal-weather-meta"><span>Wind '+Math.round(now.wind_speed_10m)+' km/h</span><span>Rain '+now.precipitation+' mm</span></div><div class="personal-forecast-list">'+rows+'</div><small class="personal-weather-source">Forecast by Open-Meteo</small>';
     }catch(error){panel.textContent=error.message||"Couldn't load the forecast.";}
   }
   async function changePassword(){

@@ -278,12 +278,30 @@
       if(!geoResponse.ok)throw new Error("Location lookup failed.");
       const geo=await geoResponse.json(),place=geo.results?.[0];
       if(!place)throw new Error("We couldn't find that location. Check the spelling in Settings.");
-      const url="https://api.open-meteo.com/v1/forecast?latitude="+place.latitude+"&longitude="+place.longitude+"&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=auto&forecast_days=3";
+      const url="https://api.open-meteo.com/v1/forecast?latitude="+encodeURIComponent(place.latitude)+"&longitude="+encodeURIComponent(place.longitude)+"&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=auto&forecast_days=3";
       const response=await fetch(url);if(!response.ok)throw new Error("Forecast service unavailable.");
       const data=await response.json(),now=data.current,days=data.daily;
-      const rows=days.time.map((day,i)=>'<div class="personal-forecast-day"><span>'+new Date(day+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short"})+'</span><span>'+weatherDescription(days.weather_code[i])+'</span><b>'+Math.round(days.temperature_2m_max[i])+'° / '+Math.round(days.temperature_2m_min[i])+'°</b></div>').join("");
-      $("personal-weather-place").textContent=place.name+(place.country?", "+place.country:"");
-      panel.innerHTML='<div class="personal-weather-now"><strong>'+Math.round(now.temperature_2m)+'°</strong><div><b>'+weatherDescription(now.weather_code)+'</b><span>Feels like '+Math.round(now.apparent_temperature)+'° · '+Math.round(now.relative_humidity_2m)+'% humidity</span></div></div><div class="personal-weather-meta"><span>Wind '+Math.round(now.wind_speed_10m)+' km/h</span><span>Rain '+now.precipitation+' mm</span></div><div class="personal-forecast-list">'+rows+'</div><small class="personal-weather-source">Forecast by Open-Meteo</small>';
+      if(!now||!Array.isArray(days?.time))throw new Error("Forecast service returned incomplete data.");
+      const make=(tag,className,value)=>{const node=document.createElement(tag);if(className)node.className=className;node.textContent=String(value);return node;};
+      $("personal-weather-place").textContent=[place.name,place.country].filter(Boolean).join(", ")||locationName;
+      const current=make("div","personal-weather-now","");
+      current.append(make("strong","",Math.round(Number(now.temperature_2m))+"°"));
+      const details=make("div","","");
+      details.append(make("b","",weatherDescription(Number(now.weather_code))));
+      details.append(make("span","","Feels like "+Math.round(Number(now.apparent_temperature))+"° · "+Math.round(Number(now.relative_humidity_2m))+"% humidity"));
+      current.append(details);
+      const meta=make("div","personal-weather-meta","");
+      meta.append(make("span","","Wind "+Math.round(Number(now.wind_speed_10m))+" km/h"));
+      meta.append(make("span","","Rain "+Number(now.precipitation)+" mm"));
+      const forecast=make("div","personal-forecast-list","");
+      days.time.forEach((day,i)=>{
+        const row=make("div","personal-forecast-day","");
+        row.append(make("span","",new Date(day+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short"})));
+        row.append(make("span","",weatherDescription(Number(days.weather_code?.[i]??-1))));
+        row.append(make("b","",Math.round(Number(days.temperature_2m_max?.[i]))+"° / "+Math.round(Number(days.temperature_2m_min?.[i]))+"°"));
+        forecast.append(row);
+      });
+      panel.replaceChildren(current,meta,forecast,make("small","personal-weather-source","Forecast by Open-Meteo"));
     }catch(error){panel.textContent=error.message||"Couldn't load the forecast.";}
   }
   async function changePassword(){

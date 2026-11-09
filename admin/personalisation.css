@@ -38,3 +38,10 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 #login .login-box input{min-height:48px;border-radius:11px;padding:12px 14px}
 #login .login-box .primary{font-family:var(--body);font-size:14px;border-radius:11px}
 .personal-theme-toggle{white-space:nowrap}
+
+.password-recovery-panel{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:rgba(10,15,12,.78);backdrop-filter:blur(12px)}
+.password-recovery-panel.hidden{display:none}
+.password-recovery-card{width:min(100%,440px);padding:30px;border:1px solid var(--line);border-radius:22px;background:var(--panel);color:var(--text);box-shadow:0 28px 90px rgba(0,0,0,.35)}
+.password-recovery-card h2{margin:8px 0;font-size:26px;letter-spacing:-.04em}
+.password-recovery-card label{display:grid;gap:8px;margin:18px 0;color:var(--muted)}
+.password-recovery-card input{width:100%;min-height:48px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text)}

@@ -13,7 +13,7 @@ const client = read("js/supabase.js");
 test("personal login offers account creation and password recovery", () => {
   assert.match(html, /id="admin-email"/);
   assert.match(html, /id="admin-password"/);
-  assert.match(auth, /id = "personal-signup"/);
+  assert.match(auth, /name\.id = "personal-name"/);
   assert.match(auth, /db\.auth\.signUp\(\{email,password,options:\{data:\{full_name\}\}\}\)/);
   assert.match(auth, /resetPasswordForEmail/);
   assert.match(auth, /password\.length < 8/);
@@ -59,5 +59,5 @@ test("personal portal has accessible status regions and account controls", () =>
   assert.match(auth, /id="personal-signout"/);
   assert.match(auth, /id="delete-account"/);
   assert.match(auth, /role="status"/);
-  assert.match(auth, /role="alert"/);
+  assert.match(html, /role="alert"/);
 });

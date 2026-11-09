@@ -310,7 +310,7 @@
     const schoolTitle=document.createElement("b");schoolTitle.textContent="Homework & school";
     const schoolCopy=document.createElement("span");
     if(!enabled.has("homework"))schoolCopy.textContent="Homework is switched off. Automatic timetable/WebUntis sync is not connected.";
-    else{
+    else try{
       const homework=await db.from("personal_homework").select("subject,title,due_date")
         .eq("user_id",currentUser.id).eq("completed",false)
         .order("due_date",{ascending:true,nullsFirst:false}).limit(1).maybeSingle();
@@ -321,7 +321,7 @@
         const due=task.due_date?new Date(task.due_date+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"no due date";
         schoolCopy.textContent=task.subject+" · "+task.title+" · Due "+due+". Automatic timetable/WebUntis sync is not connected.";
       }
-    }
+    }catch{schoolCopy.textContent="Your next homework task couldn't be loaded.";}
     school.append(schoolTitle,schoolCopy);details.append(school);
     panel.replaceChildren(...parts,details);
   }

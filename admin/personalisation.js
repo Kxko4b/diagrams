@@ -158,7 +158,7 @@
     const moduleResults=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:x.available!==false&&enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const moduleError=moduleResults.find(x=>x.error)?.error;
     if(moduleError){$("setup-description").textContent="Your profile was saved, but feature settings could not be saved: "+moduleError.message;return;}
-    profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");loadPersonalWeather();loadPersonalCalendarEvents();
+    profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");loadPersonalWeather();loadPersonalCalendarEvents();loadPersonalHomework();
   }
   function renderFeatureList(){
     $("personal-feature-list").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+(x.available===false?' · Coming soon':'')+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(x.available===false?'disabled ':'')+(enabled.has(x.id)?'checked':'')+'></label>').join("");
@@ -172,7 +172,7 @@
     const result=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:x.available!==false&&enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const error=result.find(x=>x.error)?.error;
     $("feature-status").textContent=error?"Couldn't save: "+error.message:"Features saved. Disabled modules keep their data.";
-    if(!error){renderModuleSummary();loadPersonalCalendarEvents();}if(showMessage)showPanel("features");
+    if(!error){renderModuleSummary();loadPersonalCalendarEvents();loadPersonalHomework();}if(showMessage)showPanel("features");
   }
   async function saveSettings(){
     profile.display_name=$("setting-name").value.trim();
@@ -308,7 +308,7 @@
     agenda.append(agendaTitle,agendaCopy);details.append(agenda);
     const school=document.createElement("section");school.className="personal-briefing-part";
     const schoolTitle=document.createElement("b");schoolTitle.textContent="School";
-    const schoolCopy=document.createElement("span");schoolCopy.textContent="Personal timetable and homework are not connected yet. No administrator data is shown here.";
+    const schoolCopy=document.createElement("span");schoolCopy.textContent="Personal timetable and automatic WebUntis sync are not connected yet. You can add your own assignments in Homework.";
     school.append(schoolTitle,schoolCopy);details.append(school);
     panel.replaceChildren(...parts,details);
   }

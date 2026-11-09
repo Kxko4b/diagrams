@@ -108,3 +108,12 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 .personal-untis-note{padding:11px 13px;border-left:3px solid var(--kx-accent);background:var(--kx-panel2);border-radius:0 9px 9px 0;font-size:12px;line-height:1.6}
 .personal-help-link{display:inline-flex;align-items:center;gap:5px;color:var(--kx-accent);font-size:12px;font-weight:700;text-decoration:none}
 .personal-help-link:hover{text-decoration:underline}
+
+/* Personal daily overview */
+.personal-briefing-card{grid-column:1/-1}
+.personal-briefing-date{margin:8px 0 18px;color:var(--kx-muted);font-size:14px}
+.personal-briefing-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.personal-briefing-part{display:grid;align-content:start;gap:8px;min-height:96px;padding:16px;border:1px solid var(--kx-line);border-radius:13px;background:var(--kx-panel2)}
+.personal-briefing-part b{font-size:13px}
+.personal-briefing-part span{font-size:13px;line-height:1.55;color:var(--kx-muted);overflow-wrap:anywhere}
+@media(max-width:760px){.personal-briefing-parts{grid-template-columns:1fr}.personal-briefing-part{min-height:0}}

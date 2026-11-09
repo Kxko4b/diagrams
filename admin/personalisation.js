@@ -158,7 +158,7 @@
   }
   function applyTheme(){
     const root=$("personal-app");if(!root)return;
-    root.dataset.theme=prefs.theme||"dark";root.dataset.accent=prefs.accent||"amber";
+    root.dataset.theme=prefs.theme||"dark";root.dataset.accent=prefs.accent||"amber";if(root.dataset.theme==="system")root.dataset.theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
   }
   async function deleteAccount(){
     if(!confirm("Permanently delete your account and its personal settings? This cannot be undone."))return;

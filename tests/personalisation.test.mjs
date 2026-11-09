@@ -75,6 +75,8 @@ test("personal homework is isolated from administrator homework", () => {
   assert.match(auth, /notes\.textContent=task\.details/);
   assert.match(auth, /update\(\{completed\}\)/);
   assert.match(auth, /delete\(\)/);
+  assert.match(auth, /Homework & school/);
+  assert.match(auth, /db\.from\("personal_homework"\)\.select\("subject,title,due_date"\)/);
 });
 
 test("personal homework grants only the CRUD permissions it needs", () => {

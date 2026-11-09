@@ -1,7 +1,9 @@
 /* Kxko Briefing personal accounts. Admin access remains on the existing allow-list. */
 (() => {
   "use strict";
-  const MODULES = window.KxkoFeatureRegistry || [];  const $ = (id) => document.getElementById(id);
+  const MODULES = window.KxkoFeatureRegistry || [];
+  const PERSONAL_MODULES = MODULES.filter(x => x.id !== "business");
+  const $ = (id) => document.getElementById(id);
   const isAdmin = (user) => user?.email?.toLowerCase() === "haleannson@gmail.com";
   let currentUser = null, prefs = {}, profile = {}, enabled = new Set(), step = 0;
 
@@ -66,10 +68,12 @@
       <section id="personal-setup" class="personal-panel hidden"><p class="personal-eyebrow">PERSONAL SETUP · <span id="setup-step-label">01 / 08</span></p><div class="setup-progress"><span id="setup-progress-fill"></span></div><h1 id="setup-title">Welcome</h1><p id="setup-description" class="personal-lead"></p><div id="setup-fields" class="setup-fields"></div><div class="setup-actions"><button id="setup-back" class="personal-secondary">Back</button><button id="setup-skip" class="text-button">Skip for now</button><button id="setup-next" class="personal-primary">Continue →</button></div></section>
       <section id="personal-features" class="personal-panel hidden"><p class="personal-eyebrow">MAKE IT YOURS</p><h1>Your features</h1><p class="personal-lead">Switch modules on or off whenever you like. Turning one off hides it; it does not erase its data.</p><div id="personal-feature-list" class="personal-feature-list"></div><button id="save-features" class="personal-primary">Save features</button><p id="feature-status" class="personal-status" role="status"></p></section>
       <section id="personal-settings" class="personal-panel hidden"><p class="personal-eyebrow">PREFERENCES</p><h1>Settings</h1><div class="personal-card settings-card"><label>Display name<input id="setting-name" maxlength="80"></label><label>Theme<select id="setting-theme"><option value="dark">Dark</option><option value="light">Light</option><option value="system">Use device setting</option></select></label><label>Accent colour<select id="setting-accent"><option value="amber">Warm amber</option><option value="terracotta">Terracotta</option><option value="sage">Sage green</option><option value="violet">Soft violet</option></select></label><label>Weather location<input id="setting-location" maxlength="100" placeholder="Town or city"></label><label>Layout density<select id="setting-density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label><button id="save-settings" class="personal-primary">Save preferences</button><p id="settings-status" class="personal-status" role="status"></p></div></section>
-      <section id="personal-account" class="personal-panel hidden"><p class="personal-eyebrow">ACCOUNT & PRIVACY</p><h1>My account</h1><div class="personal-card settings-card"><p id="account-email"></p><p>Your account preferences are stored against your Supabase user ID and protected by row-level security.</p><button id="delete-account" class="personal-danger">Delete my account</button><p id="account-status" class="personal-status" role="status"></p></div></section></div></section>`;
+      <section id="personal-account" class="personal-panel hidden"><p class="personal-eyebrow">ACCOUNT & PRIVACY</p><h1>My account</h1><div class="personal-card settings-card"><p id="account-email"></p><p>Your account preferences are stored against your Supabase user ID and protected by row-level security.</p><label>New password<input id="account-new-password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></label><button id="change-password" class="personal-secondary">Change password</button><p id="password-status" class="personal-status" role="status"></p><button id="delete-account" class="personal-danger">Delete my account</button><p id="account-status" class="personal-status" role="status"></p></div></section></div></section>`;
     document.body.append(root);
     root.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>showPanel(b.dataset.panel)));
     root.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPanel(b.dataset.go)));
+    $("change-password").addEventListener("click",changePassword);
+    installRecoveryPanel();
     $("personal-signout").addEventListener("click",async()=>{await db.auth.signOut();location.reload();});
     $("setup-back").addEventListener("click",()=>renderStep(Math.max(0,step-1)));
     $("setup-next").addEventListener("click",()=>{captureStep(step);step===7?finishSetup():renderStep(Math.min(7,step+1));});
@@ -123,14 +127,14 @@
     if(n===1)$("wizard-name").value=profile.display_name||currentUser.user_metadata?.full_name||"";
     if(n===2){$("wizard-theme").value=prefs.theme||"dark";$("wizard-accent").value=prefs.accent||"amber";}
     if(n===3)$("wizard-location").value=prefs.location||"Buseck";
-    if(n===7){$("wizard-modules").innerHTML=MODULES.filter(x=>x.id!=="business").map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");}
+    if(n===7){$("wizard-modules").innerHTML=PERSONAL_PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");}
   }
   async function finishSetup(){
     captureStep(step);
     const p=await db.from("user_profiles").upsert({user_id:currentUser.id,display_name:profile.display_name||"",onboarding_completed:true},{onConflict:"user_id"});
     const q=await db.from("user_preferences").upsert({user_id:currentUser.id,preferences:prefs},{onConflict:"user_id"});
     if(p.error||q.error){$("setup-description").textContent="Couldn't save your setup: "+(p.error||q.error).message;return;}
-    await Promise.all(MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
+    await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
   }
   function renderFeatureList(){
     $("personal-feature-list").innerHTML=MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");
@@ -160,6 +164,30 @@
     const root=$("personal-app");if(!root)return;
     root.dataset.theme=prefs.theme||"dark";root.dataset.accent=prefs.accent||"amber";if(root.dataset.theme==="system")root.dataset.theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
   }
+  async function changePassword(){
+    const password=$("account-new-password").value;
+    if(password.length<8){$("password-status").textContent="Use at least 8 characters.";return;}
+    const button=$("change-password");button.disabled=true;button.textContent="Updating…";
+    const {error}=await db.auth.updateUser({password});
+    button.disabled=false;button.textContent="Change password";
+    $("password-status").textContent=error?"Couldn't update password: "+error.message:"Password updated.";
+    if(!error)$("account-new-password").value="";
+  }
+  function installRecoveryPanel(){
+    if($("password-recovery-panel"))return;
+    const panel=document.createElement("section");panel.id="password-recovery-panel";panel.className="password-recovery-panel hidden";
+    panel.innerHTML='<div class="password-recovery-card"><p class="personal-eyebrow">ACCOUNT RECOVERY</p><h2>Choose a new password</h2><p>Enter a new password for your account.</p><label>New password<input id="recovery-password" type="password" minlength="8" autocomplete="new-password"></label><button id="recovery-save" class="personal-primary">Save new password</button><p id="recovery-status" role="status"></p></div>';
+    document.body.append(panel);
+    $("recovery-save").addEventListener("click",async()=>{
+      const password=$("recovery-password").value;
+      if(password.length<8){$("recovery-status").textContent="Use at least 8 characters.";return;}
+      const button=$("recovery-save");button.disabled=true;button.textContent="Saving…";
+      const {error}=await db.auth.updateUser({password});
+      button.disabled=false;button.textContent="Save new password";
+      $("recovery-status").textContent=error?"Couldn't update password: "+error.message:"Password changed. You can now sign in with it.";
+      if(!error){await db.auth.signOut();setTimeout(()=>location.reload(),900);}
+    });
+  }
   async function deleteAccount(){
     if(!confirm("Permanently delete your account and its personal settings? This cannot be undone."))return;
     const {data,error}=await db.functions.invoke("delete-account");
@@ -167,7 +195,8 @@
     await db.auth.signOut();location.reload();
   }
   async function boot(){
-    addAuthControls();ensurePortal();installAdminTheme();
+    addAuthControls();ensurePortal();installAdminTheme();installRecoveryPanel();
+    db.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY")$("password-recovery-panel")?.classList.remove("hidden");});
     const {data}=await db.auth.getUser();
     if(data?.user&&!isAdmin(data.user))await openPersonalApp(data.user);
   }

@@ -62,3 +62,8 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 .personal-forecast-day b{font-size:14px}
 .personal-weather-source{display:block;margin-top:12px}
 @media(max-width:650px){.personal-forecast-list{grid-template-columns:1fr}.personal-forecast-day{grid-template-columns:54px 1fr auto;align-items:center}.personal-weather-meta{flex-wrap:wrap}}
+
+.personal-feature-row input:disabled{opacity:.35;cursor:not-allowed}
+.personal-feature-row:has(input:disabled){opacity:.68}
+.personal-weather-card{min-width:0}
+.password-recovery-card label{color:var(--kx-muted)}

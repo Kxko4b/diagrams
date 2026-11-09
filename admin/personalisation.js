@@ -64,7 +64,7 @@
     root.innerHTML=`
       <header class="personal-topbar"><a class="personal-brand" href="#"><span class="personal-mark">K</span><span>Kxko <small>BRIEFING</small></span></a><div class="personal-top-actions"><span id="personal-email"></span><button id="personal-signout" class="text-button">Sign out</button></div></header>
       <section class="personal-shell"><aside class="personal-rail"><span class="personal-eyebrow">YOUR SPACE</span><button class="personal-tab active" data-panel="home">Overview</button><button class="personal-tab" data-panel="setup">Setup</button><button class="personal-tab" data-panel="features">Features</button><button class="personal-tab" data-panel="settings">Settings</button><button class="personal-tab" data-panel="account">My account</button></aside>
-      <div class="personal-content"><section id="personal-home" class="personal-panel"><p class="personal-eyebrow">YOUR PERSONAL BRIEFING</p><h1 id="personal-greeting">Welcome</h1><p class="personal-lead">A calmer overview of the things that matter to your day.</p><div class="personal-summary-grid"><article class="personal-card personal-welcome-card"><span class="personal-eyebrow">GETTING STARTED</span><h2 id="personal-setup-title">Make this space yours</h2><p id="personal-setup-copy">Choose your modules and preferences. External accounts are always optional.</p><button class="personal-primary" data-go="setup">Continue setup <span>→</span></button></article><article class="personal-card"><span class="personal-eyebrow">YOUR MODULES</span><div id="personal-module-summary" class="personal-module-summary"></div></article></div></section>
+      <div class="personal-content"><section id="personal-home" class="personal-panel"><p class="personal-eyebrow">YOUR PERSONAL BRIEFING</p><h1 id="personal-greeting">Welcome</h1><p class="personal-lead">A calmer overview of the things that matter to your day.</p><div class="personal-summary-grid"><article class="personal-card personal-welcome-card"><span class="personal-eyebrow">GETTING STARTED</span><h2 id="personal-setup-title">Make this space yours</h2><p id="personal-setup-copy">Choose your modules and preferences. External accounts are always optional.</p><button class="personal-primary" data-go="setup">Continue setup <span>→</span></button></article><article class="personal-card"><span class="personal-eyebrow">YOUR MODULES</span><div id="personal-module-summary" class="personal-module-summary"></div></article><article class="personal-card personal-weather-card"><div class="personal-weather-head"><div><span class="personal-eyebrow">LOCAL FORECAST</span><h2 id="personal-weather-place">Weather</h2></div><button id="personal-weather-refresh" class="personal-secondary" type="button">Refresh</button></div><div id="personal-weather-content" aria-live="polite">Add a location in Settings to see your forecast.</div></article></div></section>
       <section id="personal-setup" class="personal-panel hidden"><p class="personal-eyebrow">PERSONAL SETUP · <span id="setup-step-label">01 / 08</span></p><div class="setup-progress"><span id="setup-progress-fill"></span></div><h1 id="setup-title">Welcome</h1><p id="setup-description" class="personal-lead"></p><div id="setup-fields" class="setup-fields"></div><div class="setup-actions"><button id="setup-back" class="personal-secondary">Back</button><button id="setup-skip" class="text-button">Skip for now</button><button id="setup-next" class="personal-primary">Continue →</button></div></section>
       <section id="personal-features" class="personal-panel hidden"><p class="personal-eyebrow">MAKE IT YOURS</p><h1>Your features</h1><p class="personal-lead">Switch modules on or off whenever you like. Turning one off hides it; it does not erase its data.</p><div id="personal-feature-list" class="personal-feature-list"></div><button id="save-features" class="personal-primary">Save features</button><p id="feature-status" class="personal-status" role="status"></p></section>
       <section id="personal-settings" class="personal-panel hidden"><p class="personal-eyebrow">PREFERENCES</p><h1>Settings</h1><div class="personal-card settings-card"><label>Display name<input id="setting-name" maxlength="80"></label><label>Theme<select id="setting-theme"><option value="dark">Dark</option><option value="light">Light</option><option value="system">Use device setting</option></select></label><label>Accent colour<select id="setting-accent"><option value="amber">Warm amber</option><option value="terracotta">Terracotta</option><option value="sage">Sage green</option><option value="violet">Soft violet</option></select></label><label>Weather location<input id="setting-location" maxlength="100" placeholder="Town or city"></label><label>Layout density<select id="setting-density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label><button id="save-settings" class="personal-primary">Save preferences</button><p id="settings-status" class="personal-status" role="status"></p></div></section>
@@ -73,6 +73,7 @@
     root.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>showPanel(b.dataset.panel)));
     root.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPanel(b.dataset.go)));
     $("change-password").addEventListener("click",changePassword);
+    $("personal-weather-refresh").addEventListener("click",loadPersonalWeather);
     installRecoveryPanel();
     $("personal-signout").addEventListener("click",async()=>{await db.auth.signOut();location.reload();});
     $("setup-back").addEventListener("click",()=>renderStep(Math.max(0,step-1)));
@@ -104,6 +105,7 @@
     $("setting-name").value=profile.display_name||user.user_metadata?.full_name||"";
     $("setting-theme").value=prefs.theme||"dark"; $("setting-accent").value=prefs.accent||"amber"; $("setting-location").value=prefs.location||"Buseck"; $("setting-density").value=prefs.density||"comfortable";
     applyTheme(); renderFeatureList(); renderModuleSummary(); showPanel("home");
+    loadPersonalWeather();
     if(!profile.onboarding_completed){step=0;showPanel("setup");}
   }
   const steps=[
@@ -158,11 +160,39 @@
       db.from("user_preferences").upsert({user_id:currentUser.id,preferences:prefs},{onConflict:"user_id"})
     ]);
     $("settings-status").textContent=a.error||b.error?"Couldn't save: "+(a.error||b.error).message:"Preferences saved to your account.";
-    $("personal-greeting").textContent="Welcome"+(profile.display_name?", "+profile.display_name:"");applyTheme();
+    $("personal-greeting").textContent="Welcome"+(profile.display_name?", "+profile.display_name:"");applyTheme();loadPersonalWeather();
   }
   function applyTheme(){
     const root=$("personal-app");if(!root)return;
     root.dataset.theme=prefs.theme||"dark";root.dataset.accent=prefs.accent||"amber";if(root.dataset.theme==="system")root.dataset.theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+  }
+  function weatherDescription(code){
+    if(code===0)return "Clear sky";
+    if([1,2,3].includes(code))return "Partly cloudy";
+    if([45,48].includes(code))return "Fog";
+    if([51,53,55,56,57].includes(code))return "Drizzle";
+    if([61,63,65,66,67,80,81,82].includes(code))return "Rain";
+    if([71,73,75,77,85,86].includes(code))return "Snow";
+    if([95,96,99].includes(code))return "Thunderstorms";
+    return "Weather conditions";
+  }
+  async function loadPersonalWeather(){
+    const panel=$("personal-weather-content");if(!panel)return;
+    const locationName=prefs.location||"Buseck";
+    $("personal-weather-place").textContent=locationName;
+    if(!enabled.has("weather")){panel.textContent="Weather is switched off in Your features.";return;}
+    panel.textContent="Loading forecast…";
+    try{
+      const geoResponse=await fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(locationName)+"&count=1&language=en&format=json");
+      if(!geoResponse.ok)throw new Error("Location lookup failed.");
+      const geo=await geoResponse.json(),place=geo.results?.[0];
+      if(!place)throw new Error("We couldn't find that location. Check the spelling in Settings.");
+      const url="https://api.open-meteo.com/v1/forecast?latitude="+place.latitude+"&longitude="+place.longitude+"&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=auto&forecast_days=3";
+      const response=await fetch(url);if(!response.ok)throw new Error("Forecast service unavailable.");
+      const data=await response.json(),now=data.current,days=data.daily;
+      const rows=days.time.map((day,i)=>'<div class="personal-forecast-day"><span>'+new Date(day+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short"})+'</span><span>'+weatherDescription(days.weather_code[i])+'</span><b>'+Math.round(days.temperature_2m_max[i])+'° / '+Math.round(days.temperature_2m_min[i])+'°</b></div>').join("");
+      panel.innerHTML='<div class="personal-weather-now"><strong>'+Math.round(now.temperature_2m)+'°</strong><div><b>'+weatherDescription(now.weather_code)+'</b><span>Feels like '+Math.round(now.apparent_temperature)+'° · '+Math.round(now.relative_humidity_2m)+'% humidity</span></div></div><div class="personal-weather-meta"><span>Wind '+Math.round(now.wind_speed_10m)+' km/h</span><span>Rain '+now.precipitation+' mm</span></div><div class="personal-forecast-list">'+rows+'</div><small class="personal-weather-source">Forecast by Open-Meteo · '+place.name+(place.country?", "+place.country:"")+'</small>';
+    }catch(error){panel.textContent=error.message||"Couldn't load the forecast.";}
   }
   async function changePassword(){
     const password=$("account-new-password").value;

@@ -113,7 +113,7 @@
     $("setting-name").value=profile.display_name||user.user_metadata?.full_name||"";
     $("setting-theme").value=prefs.theme||"dark"; $("setting-accent").value=prefs.accent||"amber"; $("setting-location").value=prefs.location||"Buseck"; $("setting-density").value=prefs.density||"comfortable";
     applyTheme(); renderFeatureList(); renderModuleSummary(); showPanel("home");
-    loadPersonalWeather();loadPersonalCalendarEvents();loadPersonalBriefing();
+    loadPersonalWeather();loadPersonalCalendarEvents();
     if(!profile.onboarding_completed){step=0;showPanel("setup");}
     const callbackResult=new URLSearchParams(location.search).get("google_calendar");
     if(callbackResult){
@@ -154,7 +154,7 @@
     const moduleResults=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:x.available!==false&&enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const moduleError=moduleResults.find(x=>x.error)?.error;
     if(moduleError){$("setup-description").textContent="Your profile was saved, but feature settings could not be saved: "+moduleError.message;return;}
-    profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");loadPersonalWeather();loadPersonalCalendarEvents();loadPersonalBriefing();
+    profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");loadPersonalWeather();loadPersonalCalendarEvents();
   }
   function renderFeatureList(){
     $("personal-feature-list").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+(x.available===false?' · Coming soon':'')+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(x.available===false?'disabled ':'')+(enabled.has(x.id)?'checked':'')+'></label>').join("");

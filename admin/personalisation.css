@@ -45,3 +45,20 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 .password-recovery-card h2{margin:8px 0;font-size:26px;letter-spacing:-.04em}
 .password-recovery-card label{display:grid;gap:8px;margin:18px 0;color:var(--muted)}
 .password-recovery-card input{width:100%;min-height:48px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text)}
+
+.personal-weather-card{grid-column:1/-1}
+.personal-weather-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.personal-weather-head h2{margin:6px 0 14px;font-size:22px;letter-spacing:-.03em}
+.personal-weather-now{display:flex;align-items:center;gap:18px;padding:12px 0}
+.personal-weather-now strong{font-size:clamp(42px,7vw,64px);font-weight:600;letter-spacing:-.06em;line-height:1}
+.personal-weather-now div{display:grid;gap:5px}
+.personal-weather-now div b{font-size:17px}
+.personal-weather-now div span,.personal-weather-meta,.personal-weather-source{color:var(--muted);font-size:13px}
+.personal-weather-meta{display:flex;gap:20px;padding:4px 0 16px}
+.personal-forecast-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.personal-forecast-day{display:grid;gap:7px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.personal-forecast-day span:first-child{font-weight:700}
+.personal-forecast-day span:nth-child(2){color:var(--muted);font-size:12px}
+.personal-forecast-day b{font-size:14px}
+.personal-weather-source{display:block;margin-top:12px}
+@media(max-width:650px){.personal-forecast-list{grid-template-columns:1fr}.personal-forecast-day{grid-template-columns:54px 1fr auto;align-items:center}.personal-weather-meta{flex-wrap:wrap}}

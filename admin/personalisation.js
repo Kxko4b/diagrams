@@ -362,11 +362,17 @@
   async function loadPersonalHomework(){
     const list=$("personal-homework-list"),summary=$("personal-homework-summary");
     if(!list)return;
+    const form=$("personal-homework-form");
+    const summaryAction=document.querySelector(".personal-homework-summary-card [data-go]");
     if(!enabled.has("homework")){
+      form?.classList.add("hidden");
       list.textContent="Turn on Homework in Your features to manage your own tasks.";
       if(summary)summary.textContent="Enable the Homework module to start adding tasks.";
+      if(summaryAction){summaryAction.dataset.go="features";summaryAction.textContent="Enable homework →";}
       return;
     }
+    form?.classList.remove("hidden");
+    if(summaryAction){summaryAction.dataset.go="homework";summaryAction.textContent="Manage homework →";}
     list.textContent="Loading your tasks…";
     const {data,error}=await db.from("personal_homework")
       .select("id,subject,title,details,due_date,completed,created_at")

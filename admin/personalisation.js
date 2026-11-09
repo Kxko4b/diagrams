@@ -260,6 +260,7 @@
   }
   async function loadPersonalBriefing(){
     const panel=$("personal-briefing-content");if(!panel||!currentUser)return;
+    if(!enabled.has("briefing")){panel.textContent="Turn on Daily Overview in Your features to see your personal summary.";return;}
     panel.textContent="Putting your day together…";
     const parts=[];
     const heading=document.createElement("p");heading.className="personal-briefing-date";

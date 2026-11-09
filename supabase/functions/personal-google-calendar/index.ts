@@ -139,6 +139,19 @@ Deno.serve(async (req: Request) => {
   }
 
   if (body.action === "disconnect") {
+    const { data: refreshToken } = await admin.rpc("personal_google_get_refresh_token", { p_user_id: user.id });
+    if (refreshToken) {
+      // Revoke the Google grant when possible, then always erase our local Vault copy.
+      try {
+        await fetch("https://oauth2.googleapis.com/revoke", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ token: refreshToken }),
+        });
+      } catch (error) {
+        console.warn("Google token revocation request did not complete", error instanceof Error ? error.message : "unknown error");
+      }
+    }
     const { error } = await admin.rpc("personal_google_disconnect", { p_user_id: user.id });
     if (error) return json({ error: "Could not disconnect Google Calendar." }, 500, origin);
     return json({ success: true }, 200, origin);

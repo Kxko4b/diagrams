@@ -49,7 +49,7 @@ jobs:
           const required = [
             'personal-app', 'personal-signup', 'personal-briefing-content',
             'personal-weather-content', 'personal-calendar-content',
-            'personal-signout', 'personal-feature-list', 'personal-settings'
+            'personal-signout', 'personal-feature-list', 'personal-settings',\n            'personal-homework-form', 'personal-homework-list'
           ];
           const missing = required.filter(id => !html.includes(id) && !js.includes(id));
           if (missing.length) {
@@ -72,6 +72,7 @@ jobs:
             echo "### Checks"
             echo "- Personal portal JavaScript syntax"
             echo "- Personal account and privacy-boundary regression tests"
+            echo "- Personal homework UI hooks and task module"
             echo "- Required personal portal UI hooks"
             echo ""
             echo "This artifact is a local preview snapshot, not a production deployment."

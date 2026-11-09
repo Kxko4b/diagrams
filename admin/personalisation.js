@@ -167,7 +167,7 @@
     const result=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:x.available!==false&&enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const error=result.find(x=>x.error)?.error;
     $("feature-status").textContent=error?"Couldn't save: "+error.message:"Features saved. Disabled modules keep their data.";
-    renderModuleSummary();loadPersonalCalendarEvents();if(showMessage)showPanel("features");
+    if(!error){renderModuleSummary();loadPersonalCalendarEvents();}if(showMessage)showPanel("features");
   }
   async function saveSettings(){
     profile.display_name=$("setting-name").value.trim();

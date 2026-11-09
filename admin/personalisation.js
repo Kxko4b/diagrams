@@ -307,8 +307,21 @@
     }catch{agendaCopy.textContent="Calendar events couldn't be loaded right now.";}
     agenda.append(agendaTitle,agendaCopy);details.append(agenda);
     const school=document.createElement("section");school.className="personal-briefing-part";
-    const schoolTitle=document.createElement("b");schoolTitle.textContent="School";
-    const schoolCopy=document.createElement("span");schoolCopy.textContent="Personal timetable and automatic WebUntis sync are not connected yet. You can add your own assignments in Homework.";
+    const schoolTitle=document.createElement("b");schoolTitle.textContent="Homework & school";
+    const schoolCopy=document.createElement("span");
+    if(!enabled.has("homework"))schoolCopy.textContent="Homework is switched off. Automatic timetable/WebUntis sync is not connected.";
+    else{
+      const homework=await db.from("personal_homework").select("subject,title,due_date")
+        .eq("user_id",currentUser.id).eq("completed",false)
+        .order("due_date",{ascending:true,nullsFirst:false}).limit(1).maybeSingle();
+      if(homework.error)schoolCopy.textContent="Your next homework task couldn't be loaded.";
+      else if(!homework.data)schoolCopy.textContent="No open homework tasks. Automatic timetable/WebUntis sync is not connected.";
+      else{
+        const task=homework.data;
+        const due=task.due_date?new Date(task.due_date+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"no due date";
+        schoolCopy.textContent=task.subject+" · "+task.title+" · Due "+due+". Automatic timetable/WebUntis sync is not connected.";
+      }
+    }
     school.append(schoolTitle,schoolCopy);details.append(school);
     panel.replaceChildren(...parts,details);
   }

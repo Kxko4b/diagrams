@@ -70,6 +70,7 @@ jobs:
             echo ""
             echo "### Checks"
             echo "- Personal portal JavaScript syntax"
+            echo "- Personal account and privacy-boundary regression tests"
             echo "- Required personal portal UI hooks"
             echo ""
             echo "This artifact is a local preview snapshot, not a production deployment."

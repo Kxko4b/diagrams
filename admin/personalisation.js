@@ -359,6 +359,97 @@
       panel.replaceChildren(current,meta,forecast,make("small","personal-weather-source","Forecast by Open-Meteo"));
     }catch(error){panel.textContent=error.message||"Couldn't load the forecast.";}
   }
+  async function loadPersonalHomework(){
+    const list=$("personal-homework-list"),summary=$("personal-homework-summary");
+    if(!list)return;
+    if(!enabled.has("homework")){
+      list.textContent="Turn on Homework in Your features to manage your own tasks.";
+      if(summary)summary.textContent="Enable the Homework module to start adding tasks.";
+      return;
+    }
+    list.textContent="Loading your tasks…";
+    const {data,error}=await db.from("personal_homework")
+      .select("id,subject,title,details,due_date,completed,created_at")
+      .eq("user_id",currentUser.id)
+      .order("due_date",{ascending:true,nullsFirst:false})
+      .order("created_at",{ascending:false});
+    if(error){
+      list.textContent="Couldn't load homework: "+error.message;
+      if(summary)summary.textContent="Homework could not be loaded.";
+      return;
+    }
+    const tasks=data||[],open=tasks.filter(x=>!x.completed),done=tasks.length-open.length;
+    if(summary){
+      summary.replaceChildren();
+      const count=document.createElement("strong");count.textContent=String(open.length);
+      const label=document.createElement("span");label.textContent=" open task"+(open.length===1?"":"s");
+      const completed=document.createElement("small");completed.textContent=done+" completed";
+      summary.append(count,label,completed);
+    }
+    if(!tasks.length){list.textContent="No homework yet. Add your first task above.";return;}
+    const active=document.createElement("div");active.className="personal-homework-group";
+    const activeTitle=document.createElement("h2");activeTitle.textContent="To do · "+open.length;active.append(activeTitle);
+    const completed=document.createElement("div");completed.className="personal-homework-group";
+    const completedTitle=document.createElement("h2");completedTitle.textContent="Completed · "+done;completed.append(completedTitle);
+    const makeTask=(task)=>{
+      const card=document.createElement("article");card.className="personal-homework-item"+(task.completed?" is-complete":"");
+      const copy=document.createElement("div");copy.className="personal-homework-copy";
+      const meta=document.createElement("div");meta.className="personal-homework-meta";
+      const subject=document.createElement("span");subject.textContent=task.subject;
+      const due=document.createElement("span");
+      if(task.due_date){
+        const date=new Date(task.due_date+"T12:00:00");
+        due.textContent="Due "+(Number.isNaN(date.getTime())?task.due_date:date.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}));
+      }else due.textContent="No due date";
+      meta.append(subject,due);
+      const title=document.createElement("b");title.textContent=task.title;
+      copy.append(meta,title);
+      if(task.details){const notes=document.createElement("p");notes.textContent=task.details;copy.append(notes);}
+      const actions=document.createElement("div");actions.className="personal-homework-actions";
+      const toggle=document.createElement("button");toggle.type="button";toggle.className="personal-secondary";toggle.textContent=task.completed?"Reopen":"Mark done";
+      toggle.addEventListener("click",()=>updatePersonalHomework(task.id,!task.completed));
+      const remove=document.createElement("button");remove.type="button";remove.className="personal-danger";remove.textContent="Delete";
+      remove.addEventListener("click",()=>deletePersonalHomework(task.id));
+      actions.append(toggle,remove);card.append(copy,actions);return card;
+    };
+    open.forEach(task=>active.append(makeTask(task)));
+    tasks.filter(x=>x.completed).forEach(task=>completed.append(makeTask(task)));
+    list.replaceChildren(active,completed);
+  }
+  async function addPersonalHomework(event){
+    event.preventDefault();
+    const subject=$("personal-homework-subject").value.trim();
+    const title=$("personal-homework-title").value.trim();
+    const dueDate=$("personal-homework-due").value||null;
+    const details=$("personal-homework-details").value.trim();
+    const button=$("personal-homework-add");
+    if(!subject||!title){$("personal-homework-status").textContent="Add a subject and task description.";return;}
+    button.disabled=true;button.textContent="Adding…";
+    const {error}=await db.from("personal_homework").insert({
+      user_id:currentUser.id,subject,title,due_date:dueDate,details
+    });
+    button.disabled=false;button.textContent="Add task";
+    if(error){$("personal-homework-status").textContent="Couldn't save task: "+error.message;return;}
+    $("personal-homework-form").reset();
+    $("personal-homework-status").textContent="Task added to your personal homework.";
+    await loadPersonalHomework();
+  }
+  async function updatePersonalHomework(id,completed){
+    const {data,error}=await db.from("personal_homework").update({completed})
+      .eq("id",id).eq("user_id",currentUser.id).select("id").maybeSingle();
+    if(error||!data){$("personal-homework-status").textContent=error?.message||"Task wasn't updated.";return;}
+    $("personal-homework-status").textContent=completed?"Task marked complete.":"Task moved back to your to-do list.";
+    await loadPersonalHomework();
+  }
+  async function deletePersonalHomework(id){
+    if(!confirm("Delete this homework task?"))return;
+    const {data,error}=await db.from("personal_homework").delete()
+      .eq("id",id).eq("user_id",currentUser.id).select("id").maybeSingle();
+    if(error||!data){$("personal-homework-status").textContent=error?.message||"Task wasn't deleted.";return;}
+    $("personal-homework-status").textContent="Task deleted.";
+    await loadPersonalHomework();
+  }
+
   async function changePassword(){
     const password=$("account-new-password").value;
     if(password.length<8){$("password-status").textContent="Use at least 8 characters.";return;}

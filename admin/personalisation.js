@@ -137,15 +137,15 @@
     await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
   }
   function renderFeatureList(){
-    $("personal-feature-list").innerHTML=MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");
+    $("personal-feature-list").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");
   }
   function renderModuleSummary(){
-    $("personal-module-summary").innerHTML=MODULES.filter(x=>enabled.has(x.id)).map(x=>'<span>'+x.name+'</span>').join("")||"<p>No modules enabled yet.</p>";
+    $("personal-module-summary").innerHTML=PERSONAL_MODULES.filter(x=>enabled.has(x.id)).map(x=>'<span>'+x.name+'</span>').join("")||"<p>No modules enabled yet.</p>";
   }
   async function saveFeatures(showMessage=true){
     const rows=[...document.querySelectorAll("#personal-feature-list [data-module]")];
     rows.forEach(c=>c.checked?enabled.add(c.dataset.module):enabled.delete(c.dataset.module));
-    const result=await Promise.all(MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));
+    const result=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const error=result.find(x=>x.error)?.error;
     $("feature-status").textContent=error?"Couldn't save: "+error.message:"Features saved. Disabled modules keep their data.";
     renderModuleSummary();if(showMessage)showPanel("features");

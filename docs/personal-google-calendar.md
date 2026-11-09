@@ -36,4 +36,4 @@ If the hosted portal is moved to another domain or path, update `APP_RETURN_URL`
 - A database trigger removes the Vault secret if the Supabase Auth user is deleted through another route.
 - Calendar permission is read-only. The feature does not create, edit or delete Google events.
 
-The personal Calendar *dashboard module* remains separate work: this connection centre currently proves the account connection and lists calendars, but does not yet render events in the daily briefing.
+The personal Calendar module now displays upcoming events from the user's primary calendar for the next seven days. It shows event titles, local start times, optional locations and a safe link back to Google Calendar. It does not create, edit or delete events.

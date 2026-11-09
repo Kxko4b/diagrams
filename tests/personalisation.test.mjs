@@ -43,7 +43,7 @@ test("the feature catalogue distinguishes available modules from future integrat
   assert.match(registry, /id:"calendar".*available:true/);
   assert.match(registry, /id:"webuntis".*available:false/);
   assert.match(registry, /id:"timetable".*available:false/);
-  assert.match(registry, /id:"homework".*available:false/);
+  assert.match(registry, /id:"homework".*available:true/);
 });
 
 test("Google refresh tokens stay server-side and personal data is user-scoped", () => {
@@ -60,4 +60,27 @@ test("personal portal has accessible status regions and account controls", () =>
   assert.match(auth, /id="delete-account"/);
   assert.match(auth, /role="status"/);
   assert.match(html, /role="alert"/);
+});
+
+test("personal homework is isolated from administrator homework", () => {
+  const migration = read("supabase/migrations/20261109215633_personal_homework.sql");
+  assert.match(migration, /create table if not exists public\.personal_homework/);
+  assert.match(migration, /user_id uuid not null references auth\.users\(id\) on delete cascade/);
+  assert.match(migration, /enable row level security/);
+  assert.match(migration, /\(select auth\.uid\(\)\) = user_id/);
+  assert.match(migration, /grant select, insert, update, delete on public\.personal_homework to authenticated/);
+  assert.match(auth, /db\.from\("personal_homework"\)/);
+  assert.match(auth, /user_id:currentUser\.id/);
+  assert.match(auth, /title\.textContent=task\.title/);
+  assert.match(auth, /notes\.textContent=task\.details/);
+  assert.match(auth, /update\(\{completed\}\)/);
+  assert.match(auth, /delete\(\)/);
+});
+
+test("homework can be switched on independently of WebUntis", () => {
+  assert.match(registry, /id:"homework".*available:true/);
+  assert.match(registry, /id:"webuntis".*available:false/);
+  assert.match(auth, /id="personal-homework-form"/);
+  assert.match(auth, /id="personal-homework-list"/);
+  assert.match(auth, /This is separate from WebUntis/);
 });

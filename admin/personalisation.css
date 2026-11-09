@@ -10,14 +10,14 @@
 @media(prefers-reduced-motion:reduce){.personal-app *{transition:none!important;animation:none!important}}
 
 /* Shared dashboard refresh: warm paper, evergreen, and restrained amber. */
-#app{background:var(--bg);color:var(--text)}
+#app{background:var(--bg);color:inherit}
 #app .sidebar{background:#202a25!important;border-right:1px solid rgba(230,235,225,.09)!important}
 #app .brand-icon,#app .login-logo{background:#d5a45f!important;color:#202a25!important;border-radius:12px!important}
 #app .nav-button{border-radius:12px!important;min-height:46px;transition:background .18s ease,transform .18s ease}
 #app .nav-button.active{background:rgba(213,164,95,.15)!important;border-color:rgba(213,164,95,.2)!important;box-shadow:inset 3px 0 0 #d5a45f!important;color:#f3dfbd!important}
 #app .dashboard-header{background:rgba(27,33,29,.94)!important;border-bottom:1px solid rgba(230,235,225,.1)!important}
 #app .section-card,#app .stat-card,#app .request-card,#app .admin-question-card,#app .admin-review-card,#app .weather-card,#app .overview-weather,#app .business-tile,#app .quick-action,#app .briefing-live-panel,#app .briefing-weather-shortcut{border:1px solid rgba(230,235,225,.1)!important;border-radius:16px!important;box-shadow:0 12px 30px rgba(0,0,0,.12)!important}
-#app .section-card,#app .stat-card,#app .request-card,#app .admin-question-card,#app .admin-review-card,#app .weather-card,#app .overview-weather,#app .business-tile,#app .quick-action{background:var(--surface)!important}
+#app .section-card,#app .stat-card,#app .request-card,#app .admin-question-card,#app .admin-review-card,#app .weather-card,#app .overview-weather,#app .business-tile,#app .quick-action{background:var(--kx-panel2)!important}
 #app .primary,#app button.primary{background:#d5a45f!important;border:1px solid #d5a45f!important;color:#202a25!important;border-radius:11px!important;font-family:var(--body)!important;font-weight:700!important;letter-spacing:0!important}
 #app input,#app textarea,#app select{border-radius:10px!important}
 #app .dashboard-header{min-height:72px}
@@ -41,10 +41,10 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 
 .password-recovery-panel{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:rgba(10,15,12,.78);backdrop-filter:blur(12px)}
 .password-recovery-panel.hidden{display:none}
-.password-recovery-card{width:min(100%,440px);padding:30px;border:1px solid var(--line);border-radius:22px;background:var(--panel);color:var(--text);box-shadow:0 28px 90px rgba(0,0,0,.35)}
+.password-recovery-card{width:min(100%,440px);padding:30px;border:1px solid var(--kx-line);border-radius:22px;background:var(--kx-panel);color:inherit;box-shadow:0 28px 90px rgba(0,0,0,.35)}
 .password-recovery-card h2{margin:8px 0;font-size:26px;letter-spacing:-.04em}
 .password-recovery-card label{display:grid;gap:8px;margin:18px 0;color:var(--muted)}
-.password-recovery-card input{width:100%;min-height:48px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text)}
+.password-recovery-card input{width:100%;min-height:48px;padding:12px;border:1px solid var(--kx-line);border-radius:10px;background:var(--kx-panel2);color:inherit}
 
 .personal-weather-card{grid-column:1/-1}
 .personal-weather-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
@@ -56,7 +56,7 @@ html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea
 .personal-weather-now div span,.personal-weather-meta,.personal-weather-source{color:var(--muted);font-size:13px}
 .personal-weather-meta{display:flex;gap:20px;padding:4px 0 16px}
 .personal-forecast-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.personal-forecast-day{display:grid;gap:7px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.personal-forecast-day{display:grid;gap:7px;padding:14px;border:1px solid var(--kx-line);border-radius:12px;background:var(--kx-panel2)}
 .personal-forecast-day span:first-child{font-weight:700}
 .personal-forecast-day span:nth-child(2){color:var(--muted);font-size:12px}
 .personal-forecast-day b{font-size:14px}

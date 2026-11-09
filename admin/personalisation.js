@@ -67,7 +67,7 @@
       <div class="personal-content"><section id="personal-home" class="personal-panel"><p class="personal-eyebrow">YOUR PERSONAL BRIEFING</p><h1 id="personal-greeting">Welcome</h1><p class="personal-lead">A calmer overview of the things that matter to your day.</p><div class="personal-summary-grid"><article class="personal-card personal-welcome-card"><span class="personal-eyebrow">GETTING STARTED</span><h2 id="personal-setup-title">Make this space yours</h2><p id="personal-setup-copy">Choose your modules and preferences. External accounts are always optional.</p><button class="personal-primary" data-go="setup">Continue setup <span>→</span></button></article><article class="personal-card"><span class="personal-eyebrow">YOUR MODULES</span><div id="personal-module-summary" class="personal-module-summary"></div></article><article class="personal-card personal-weather-card"><div class="personal-weather-head"><div><span class="personal-eyebrow">LOCAL FORECAST</span><h2 id="personal-weather-place">Weather</h2></div><button id="personal-weather-refresh" class="personal-secondary" type="button">Refresh</button></div><div id="personal-weather-content" aria-live="polite">Add a location in Settings to see your forecast.</div></article></div></section>
       <section id="personal-setup" class="personal-panel hidden"><p class="personal-eyebrow">PERSONAL SETUP · <span id="setup-step-label">01 / 08</span></p><div class="setup-progress"><span id="setup-progress-fill"></span></div><h1 id="setup-title">Welcome</h1><p id="setup-description" class="personal-lead"></p><div id="setup-fields" class="setup-fields"></div><div class="setup-actions"><button id="setup-back" class="personal-secondary">Back</button><button id="setup-skip" class="text-button">Skip for now</button><button id="setup-next" class="personal-primary">Continue →</button></div></section>
       <section id="personal-features" class="personal-panel hidden"><p class="personal-eyebrow">MAKE IT YOURS</p><h1>Your features</h1><p class="personal-lead">Switch modules on or off whenever you like. Turning one off hides it; it does not erase its data.</p><div id="personal-feature-list" class="personal-feature-list"></div><button id="save-features" class="personal-primary">Save features</button><p id="feature-status" class="personal-status" role="status"></p></section>
-      <section id="personal-connections" class="personal-panel hidden"><p class="personal-eyebrow">ACCOUNTS & SERVICES</p><h1>Connections</h1><p class="personal-lead">Each service will be connected to your own account. Administrator credentials and calendars are never reused here.</p><div class="personal-connection-list"><article class="personal-card"><div><b>Weather</b><span class="personal-connection-state connected">Available</span></div><p>Uses the location saved in your preferences. No external account or password needed.</p></article><article class="personal-card"><div><b>WebUntis</b><span class="personal-connection-state pending">Coming soon</span></div><p>Personal school-account connection is not available yet. Your administrator's timetable stays private.</p></article><article class="personal-card"><div><b>Google Calendar</b><span class="personal-connection-state pending">Coming soon</span></div><p>A separate Google sign-in and private token storage are required before this can be enabled.</p></article><article class="personal-card"><div><b>Notifications</b><span class="personal-connection-state pending">Coming soon</span></div><p>Personal push delivery is not enabled yet. Existing administrator notifications remain separate.</p></article></div></section>
+      <section id="personal-connections" class="personal-panel hidden"><p class="personal-eyebrow">ACCOUNTS & SERVICES</p><h1>Connections</h1><p class="personal-lead">Each service will be connected to your own account. Administrator credentials and calendars are never reused here.</p><div class="personal-connection-list"><article class="personal-card"><div><b>Weather</b><span class="personal-connection-state connected">Available</span></div><p>Uses the location saved in your preferences. No external account or password needed.</p></article><article class="personal-card"><div><b>WebUntis</b><span class="personal-connection-state pending">Coming soon</span></div><p>Personal school-account connection is not available yet. Your administrator's timetable stays private.</p></article><article class="personal-card personal-google-card"><div><b>Google Calendar</b><span id="google-calendar-state" class="personal-connection-state pending">Not connected</span></div><p>Connect your own Google account. Kxko requests read-only calendar access; your refresh token is encrypted in Supabase Vault and never sent to the browser.</p><div class="personal-google-actions"><button id="connect-google-calendar" class="personal-secondary" type="button">Connect Google Calendar</button><button id="disconnect-google-calendar" class="personal-danger hidden" type="button">Disconnect</button></div><p id="google-calendar-status" class="personal-status" role="status"></p><div id="google-calendar-list" class="personal-google-list"></div></article><article class="personal-card"><div><b>Notifications</b><span class="personal-connection-state pending">Coming soon</span></div><p>Personal push delivery is not enabled yet. Existing administrator notifications remain separate.</p></article></div></section>
       <section id="personal-settings" class="personal-panel hidden"><p class="personal-eyebrow">PREFERENCES</p><h1>Settings</h1><div class="personal-card settings-card"><label>Display name<input id="setting-name" maxlength="80"></label><label>Theme<select id="setting-theme"><option value="dark">Dark</option><option value="light">Light</option><option value="system">Use device setting</option></select></label><label>Accent colour<select id="setting-accent"><option value="amber">Warm amber</option><option value="terracotta">Terracotta</option><option value="sage">Sage green</option><option value="violet">Soft violet</option></select></label><label>Weather location<input id="setting-location" maxlength="100" placeholder="Town or city"></label><label>Layout density<select id="setting-density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label><button id="save-settings" class="personal-primary">Save preferences</button><p id="settings-status" class="personal-status" role="status"></p></div></section>
       <section id="personal-account" class="personal-panel hidden"><p class="personal-eyebrow">ACCOUNT & PRIVACY</p><h1>My account</h1><div class="personal-card settings-card"><p id="account-email"></p><p>Your account preferences are stored against your Supabase user ID and protected by row-level security.</p><label>New password<input id="account-new-password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></label><button id="change-password" class="personal-secondary">Change password</button><p id="password-status" class="personal-status" role="status"></p><button id="delete-account" class="personal-danger">Delete my account</button><p id="account-status" class="personal-status" role="status"></p></div></section></div></section>`;
     document.body.append(root);
@@ -75,6 +75,8 @@
     root.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPanel(b.dataset.go)));
     $("change-password").addEventListener("click",changePassword);
     $("personal-weather-refresh").addEventListener("click",loadPersonalWeather);
+    $("connect-google-calendar").addEventListener("click",connectGoogleCalendar);
+    $("disconnect-google-calendar").addEventListener("click",disconnectGoogleCalendar);
     installRecoveryPanel();
     $("personal-signout").addEventListener("click",async()=>{await db.auth.signOut();location.reload();});
     $("setup-back").addEventListener("click",()=>renderStep(Math.max(0,step-1)));
@@ -89,6 +91,7 @@
     document.querySelectorAll(".personal-panel").forEach(p=>p.classList.toggle("hidden",p.id!=="personal-"+name));
     document.querySelectorAll(".personal-tab").forEach(b=>b.classList.toggle("active",b.dataset.panel===name));
     if(name==="setup")renderStep(step);
+    if(name==="connections"&&currentUser)loadGoogleConnection();
   }
   async function openPersonalApp(user) {
     currentUser=user; ensurePortal();
@@ -109,6 +112,13 @@
     applyTheme(); renderFeatureList(); renderModuleSummary(); showPanel("home");
     loadPersonalWeather();
     if(!profile.onboarding_completed){step=0;showPanel("setup");}
+    const callbackResult=new URLSearchParams(location.search).get("google_calendar");
+    if(callbackResult){
+      const messages={connected:"Google Calendar connected successfully.",cancelled:"Google connection was cancelled.",invalid_state:"The connection expired or could not be verified. Please try again.",token_error:"Google did not return the required authorisation. Try connecting again.",storage_error:"The connection was approved but could not be saved securely.",callback_error:"Google Calendar could not be connected. Please try again."};
+      $("google-calendar-status").textContent=messages[callbackResult]||"Google Calendar connection returned an unknown status.";
+      history.replaceState(null,"",location.pathname+location.hash);
+      showPanel("connections");
+    }
   }
   const steps=[
     ["Welcome","A personal home for your weather, school day, calendar and more.","<p>Set up the parts you want. You can skip integrations and come back whenever you like.</p>"],
@@ -116,7 +126,7 @@
     ["Appearance","Choose a look that feels right.","<label>Theme<select id='wizard-theme'><option value='dark'>Dark</option><option value='light'>Light</option><option value='system'>Use device setting</option></select></label><label>Accent<select id='wizard-accent'><option value='amber'>Warm amber</option><option value='terracotta'>Terracotta</option><option value='sage'>Sage green</option><option value='violet'>Soft violet</option></select></label>"],
     ["Weather","Where should we look for your forecast?","<label>Location<input id='wizard-location' placeholder='Town or city' value='Buseck'></label><p>Weather alerts can be configured later. No location permission is required.</p>"],
     ["School / WebUntis","Personal WebUntis access is not available yet.","<p>The existing administrator timetable is private and will not be shared with personal accounts. Do not enter your school password here.</p>"],
-    ["Calendar","Personal Google Calendar connection is not available yet.","<p>The administrator calendar remains private. A separate, secure Google sign-in flow is required before personal accounts can connect.</p>"],
+    ["Calendar","Connect your own Google account after setup.","<p>Calendar access is optional and read-only. Your administrator calendar is never shared with your personal account.</p>"],
     ["Daily Briefing","Choose the information you want in your daily summary.","<p>Start with weather and the briefing module. You can adjust sections and delivery schedules later.</p>"],
     ["Your modules","Enable the features you want to see.","<div id='wizard-modules'></div>"]
   ];
@@ -175,6 +185,42 @@
   function applyTheme(){
     const root=$("personal-app");if(!root)return;
     root.dataset.theme=prefs.theme||"dark";root.dataset.accent=prefs.accent||"amber";root.dataset.density=prefs.density||"comfortable";if(root.dataset.theme==="system")root.dataset.theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+  }
+  async function connectGoogleCalendar(){
+    const button=$("connect-google-calendar");button.disabled=true;button.textContent="Opening Google…";
+    $("google-calendar-status").textContent="";
+    const {data,error}=await db.functions.invoke("personal-google-calendar",{body:{action:"connect"}});
+    button.disabled=false;button.textContent="Connect Google Calendar";
+    if(error||!data?.url){$("google-calendar-status").textContent=error?.message||data?.error||"Could not start Google sign-in.";return;}
+    location.assign(data.url);
+  }
+  async function loadGoogleConnection(){
+    const state=$("google-calendar-state"),disconnect=$("disconnect-google-calendar"),list=$("google-calendar-list");
+    if(!state)return;
+    state.textContent="Checking…";state.className="personal-connection-state pending";
+    list.replaceChildren();
+    const {data,error}=await db.functions.invoke("personal-google-calendar",{body:{action:"status"}});
+    if(error||data?.error){state.textContent="Unavailable";$("google-calendar-status").textContent=error?.message||data?.error||"Could not check connection.";return;}
+    if(!data.connected){state.textContent="Not connected";state.className="personal-connection-state pending";disconnect.classList.add("hidden");return;}
+    state.textContent="Connected";state.className="personal-connection-state connected";disconnect.classList.remove("hidden");
+    $("google-calendar-status").textContent="Connected as "+(data.connection.google_email||"your Google account")+".";
+    const result=await db.functions.invoke("personal-google-calendar",{body:{action:"calendars"}});
+    if(result.error||result.data?.error){$("google-calendar-status").textContent=result.error?.message||result.data?.error||"Could not load calendars.";return;}
+    const heading=document.createElement("p");heading.className="personal-google-list-heading";heading.textContent="Your available calendars";list.append(heading);
+    const items=result.data.calendars||[];
+    if(!items.length){const empty=document.createElement("p");empty.textContent="No calendars were returned by Google.";list.append(empty);return;}
+    const ul=document.createElement("ul");
+    items.forEach(calendar=>{const li=document.createElement("li");const name=document.createElement("span");name.textContent=calendar.summary||"Untitled calendar";li.append(name);if(calendar.primary){const tag=document.createElement("small");tag.textContent="Primary";li.append(tag);}ul.append(li);});
+    list.append(ul);
+  }
+  async function disconnectGoogleCalendar(){
+    if(!window.confirm("Disconnect your Google Calendar? Kxko will delete the stored connection token."))return;
+    const button=$("disconnect-google-calendar");button.disabled=true;
+    const {data,error}=await db.functions.invoke("personal-google-calendar",{body:{action:"disconnect"}});
+    button.disabled=false;
+    if(error||data?.error){$("google-calendar-status").textContent=error?.message||data?.error||"Could not disconnect.";return;}
+    $("google-calendar-status").textContent="Google Calendar disconnected and its stored token deleted.";
+    await loadGoogleConnection();
   }
   function weatherDescription(code){
     if(code===0)return "Clear sky";

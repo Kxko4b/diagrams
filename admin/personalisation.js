@@ -127,7 +127,7 @@
     if(n===1)$("wizard-name").value=profile.display_name||currentUser.user_metadata?.full_name||"";
     if(n===2){$("wizard-theme").value=prefs.theme||"dark";$("wizard-accent").value=prefs.accent||"amber";}
     if(n===3)$("wizard-location").value=prefs.location||"Buseck";
-    if(n===7){$("wizard-modules").innerHTML=PERSONAL_PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");}
+    if(n===7){$("wizard-modules").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");}
   }
   async function finishSetup(){
     captureStep(step);

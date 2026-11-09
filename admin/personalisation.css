@@ -32,3 +32,9 @@ html[data-kx-theme="light"] #app .dashboard-header{background:rgba(255,255,255,.
 html[data-kx-theme="light"] #app .section-card,html[data-kx-theme="light"] #app .stat-card,html[data-kx-theme="light"] #app .request-card,html[data-kx-theme="light"] #app .admin-question-card,html[data-kx-theme="light"] #app .admin-review-card,html[data-kx-theme="light"] #app .weather-card,html[data-kx-theme="light"] #app .overview-weather,html[data-kx-theme="light"] #app .business-tile,html[data-kx-theme="light"] #app .quick-action{background:#fff!important;color:#222b25!important;border-color:rgba(32,43,37,.13)!important}
 html[data-kx-theme="light"] #app input,html[data-kx-theme="light"] #app textarea,html[data-kx-theme="light"] #app select{background:#fff!important;color:#222b25!important}
 @media(max-width:800px){#app .sidebar{background:#202a25!important}#app .nav-button{border-radius:12px!important}#app .dashboard{padding-bottom:82px}}
+
+#login .login-box{border:1px solid var(--border);border-radius:22px;border-top:1px solid var(--border);padding:38px;box-shadow:0 24px 70px rgba(0,0,0,.24)}
+#login .login-box h1{font-family:var(--body);font-size:30px;text-transform:none;letter-spacing:-.04em}
+#login .login-box input{min-height:48px;border-radius:11px;padding:12px 14px}
+#login .login-box .primary{font-family:var(--body);font-size:14px;border-radius:11px}
+.personal-theme-toggle{white-space:nowrap}

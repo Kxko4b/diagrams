@@ -98,7 +98,7 @@
       db.from("user_modules").select("*").eq("user_id",user.id)
     ]);
     if(pr.error||pe.error||mo.error){console.error(pr.error||pe.error||mo.error);$("personal-greeting").textContent="Your account is ready";$("personal-setup-copy").textContent="Your profile tables need the supplied Supabase migration before preferences can sync.";return;}
-    profile=pr.data||{}; prefs=pe.data?.preferences||{}; enabled=new Set((mo.data||[]).filter(x=>x.enabled).map(x=>x.module_key));
+    profile=pr.data||{}; prefs=pe.data?.preferences||{}; enabled=new Set((mo.data||[]).filter(x=>x.enabled&&PERSONAL_MODULES.some(m=>m.id===x.module_key&&m.available!==false)).map(x=>x.module_key));
     $("personal-greeting").textContent="Welcome"+(profile.display_name?" back, "+profile.display_name:"");
     $("personal-setup-title").textContent=profile.onboarding_completed?"Your space is ready":"Let's set things up";
     $("personal-setup-copy").textContent=profile.onboarding_completed?"Your preferences are saved. You can change them at any time.":"A few quick choices will make your briefing feel like yours.";
@@ -129,7 +129,7 @@
     if(n===1)$("wizard-name").value=profile.display_name||currentUser.user_metadata?.full_name||"";
     if(n===2){$("wizard-theme").value=prefs.theme||"dark";$("wizard-accent").value=prefs.accent||"amber";}
     if(n===3)$("wizard-location").value=prefs.location||"Buseck";
-    if(n===7){$("wizard-modules").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");}
+    if(n===7){$("wizard-modules").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+(x.available===false?' · Coming soon':'')+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(x.available===false?'disabled ':'')+(enabled.has(x.id)?'checked':'')+'></label>').join("");}
   }
   async function finishSetup(){
     captureStep(step);
@@ -139,10 +139,10 @@
     await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
   }
   function renderFeatureList(){
-    $("personal-feature-list").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(enabled.has(x.id)?'checked':'')+'></label>').join("");
+    $("personal-feature-list").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+(x.available===false?' · Coming soon':'')+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(x.available===false?'disabled ':'')+(enabled.has(x.id)?'checked':'')+'></label>').join("");
   }
   function renderModuleSummary(){
-    $("personal-module-summary").innerHTML=PERSONAL_MODULES.filter(x=>enabled.has(x.id)).map(x=>'<span>'+x.name+'</span>').join("")||"<p>No modules enabled yet.</p>";
+    $("personal-module-summary").innerHTML=PERSONAL_MODULES.filter(x=>x.available!==false&&enabled.has(x.id)).map(x=>'<span>'+x.name+'</span>').join("")||"<p>No modules enabled yet.</p>";
   }
   async function saveFeatures(showMessage=true){
     const rows=[...document.querySelectorAll("#personal-feature-list [data-module]")];

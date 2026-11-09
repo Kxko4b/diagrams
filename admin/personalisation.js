@@ -64,7 +64,7 @@
     root.innerHTML=`
       <header class="personal-topbar"><a class="personal-brand" href="#"><span class="personal-mark">K</span><span>Kxko <small>BRIEFING</small></span></a><div class="personal-top-actions"><span id="personal-email"></span><button id="personal-signout" class="text-button">Sign out</button></div></header>
       <section class="personal-shell"><aside class="personal-rail"><span class="personal-eyebrow">YOUR SPACE</span><button class="personal-tab active" data-panel="home">Overview</button><button class="personal-tab" data-panel="setup">Setup</button><button class="personal-tab" data-panel="features">Features</button><button class="personal-tab" data-panel="connections">Connections</button><button class="personal-tab" data-panel="settings">Settings</button><button class="personal-tab" data-panel="account">My account</button></aside>
-      <div class="personal-content"><section id="personal-home" class="personal-panel"><p class="personal-eyebrow">YOUR PERSONAL BRIEFING</p><h1 id="personal-greeting">Welcome</h1><p class="personal-lead">A calmer overview of the things that matter to your day.</p><div class="personal-summary-grid"><article class="personal-card personal-welcome-card"><span class="personal-eyebrow">GETTING STARTED</span><h2 id="personal-setup-title">Make this space yours</h2><p id="personal-setup-copy">Choose your modules and preferences. External accounts are always optional.</p><button class="personal-primary" data-go="setup">Continue setup <span>→</span></button></article><article class="personal-card"><span class="personal-eyebrow">YOUR MODULES</span><div id="personal-module-summary" class="personal-module-summary"></div></article><article class="personal-card personal-weather-card"><div class="personal-weather-head"><div><span class="personal-eyebrow">LOCAL FORECAST</span><h2 id="personal-weather-place">Weather</h2></div><button id="personal-weather-refresh" class="personal-secondary" type="button">Refresh</button></div><div id="personal-weather-content" aria-live="polite">Add a location in Settings to see your forecast.</div></article><article class="personal-card personal-calendar-card"><div class="personal-weather-head"><div><span class="personal-eyebrow">YOUR NEXT SEVEN DAYS</span><h2>Calendar</h2></div><button id="personal-calendar-refresh" class="personal-secondary" type="button">Refresh</button></div><div id="personal-calendar-content" aria-live="polite">Connect Google Calendar to see upcoming events.</div></article></div></section>
+      <div class="personal-content"><section id="personal-home" class="personal-panel"><p class="personal-eyebrow">YOUR PERSONAL BRIEFING</p><h1 id="personal-greeting">Welcome</h1><p class="personal-lead">A calmer overview of the things that matter to your day.</p><div class="personal-summary-grid"><article class="personal-card personal-briefing-card"><div class="personal-weather-head"><div><span class="personal-eyebrow">TODAY AT A GLANCE</span><h2>Your daily overview</h2></div><button id="personal-briefing-refresh" class="personal-secondary" type="button">Refresh</button></div><div id="personal-briefing-content" aria-live="polite">Your personal overview will appear here.</div></article><article class="personal-card personal-welcome-card"><span class="personal-eyebrow">GETTING STARTED</span><h2 id="personal-setup-title">Make this space yours</h2><p id="personal-setup-copy">Choose your modules and preferences. External accounts are always optional.</p><button class="personal-primary" data-go="setup">Continue setup <span>→</span></button></article><article class="personal-card"><span class="personal-eyebrow">YOUR MODULES</span><div id="personal-module-summary" class="personal-module-summary"></div></article><article class="personal-card personal-weather-card"><div class="personal-weather-head"><div><span class="personal-eyebrow">LOCAL FORECAST</span><h2 id="personal-weather-place">Weather</h2></div><button id="personal-weather-refresh" class="personal-secondary" type="button">Refresh</button></div><div id="personal-weather-content" aria-live="polite">Add a location in Settings to see your forecast.</div></article><article class="personal-card personal-calendar-card"><div class="personal-weather-head"><div><span class="personal-eyebrow">YOUR NEXT SEVEN DAYS</span><h2>Calendar</h2></div><button id="personal-calendar-refresh" class="personal-secondary" type="button">Refresh</button></div><div id="personal-calendar-content" aria-live="polite">Connect Google Calendar to see upcoming events.</div></article></div></section>
       <section id="personal-setup" class="personal-panel hidden"><p class="personal-eyebrow">PERSONAL SETUP · <span id="setup-step-label">01 / 08</span></p><div class="setup-progress"><span id="setup-progress-fill"></span></div><h1 id="setup-title">Welcome</h1><p id="setup-description" class="personal-lead"></p><div id="setup-fields" class="setup-fields"></div><div class="setup-actions"><button id="setup-back" class="personal-secondary">Back</button><button id="setup-skip" class="text-button">Skip for now</button><button id="setup-next" class="personal-primary">Continue →</button></div></section>
       <section id="personal-features" class="personal-panel hidden"><p class="personal-eyebrow">MAKE IT YOURS</p><h1>Your features</h1><p class="personal-lead">Switch modules on or off whenever you like. Turning one off hides it; it does not erase its data.</p><div id="personal-feature-list" class="personal-feature-list"></div><button id="save-features" class="personal-primary">Save features</button><p id="feature-status" class="personal-status" role="status"></p></section>
       <section id="personal-connections" class="personal-panel hidden"><p class="personal-eyebrow">ACCOUNTS & SERVICES</p><h1>Connections</h1><p class="personal-lead">Each service will be connected to your own account. Administrator credentials and calendars are never reused here.</p><div class="personal-connection-list"><article class="personal-card"><div><b>Weather</b><span class="personal-connection-state connected">Available</span></div><p>Uses the location saved in your preferences. No external account or password needed.</p></article><article class="personal-card personal-untis-card"><div><b>WebUntis</b><span class="personal-connection-state pending">Awaiting platform setup</span></div><p>Personal school sign-in will use the official Untis Platform login. Kxko will never ask you to type your WebUntis password into this app, and your administrator's timetable stays private.</p><p class="personal-untis-note">This requires a registered Untis Platform application and activation by the school. The existing administrator connection uses a different legacy integration and cannot safely be reused for personal accounts.</p><a class="personal-help-link" href="https://developer.untis.com/getting-started/get-platform-application/" target="_blank" rel="noopener noreferrer">Why does this need school setup? ↗</a></article><article class="personal-card personal-google-card"><div><b>Google Calendar</b><span id="google-calendar-state" class="personal-connection-state pending">Not connected</span></div><p>Connect your own Google account. Kxko requests read-only calendar access; your refresh token is encrypted in Supabase Vault and never sent to the browser.</p><div class="personal-google-actions"><button id="connect-google-calendar" class="personal-secondary" type="button">Connect Google Calendar</button><button id="disconnect-google-calendar" class="personal-danger hidden" type="button">Disconnect</button></div><p id="google-calendar-status" class="personal-status" role="status"></p><div id="google-calendar-list" class="personal-google-list"></div></article><article class="personal-card"><div><b>Notifications</b><span class="personal-connection-state pending">Coming soon</span></div><p>Personal push delivery is not enabled yet. Existing administrator notifications remain separate.</p></article></div></section>
@@ -75,6 +75,7 @@
     root.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPanel(b.dataset.go)));
     $("change-password").addEventListener("click",changePassword);
     $("personal-weather-refresh").addEventListener("click",loadPersonalWeather);
+    $("personal-briefing-refresh").addEventListener("click",loadPersonalBriefing);
     $("personal-calendar-refresh").addEventListener("click",loadPersonalCalendarEvents);
     $("connect-google-calendar").addEventListener("click",connectGoogleCalendar);
     $("disconnect-google-calendar").addEventListener("click",disconnectGoogleCalendar);
@@ -93,7 +94,7 @@
     document.querySelectorAll(".personal-tab").forEach(b=>b.classList.toggle("active",b.dataset.panel===name));
     if(name==="setup")renderStep(step);
     if(name==="connections"&&currentUser)loadGoogleConnection();
-    if(name==="home"&&currentUser)loadPersonalCalendarEvents();
+    if(name==="home"&&currentUser){loadPersonalCalendarEvents();loadPersonalBriefing();}
   }
   async function openPersonalApp(user) {
     currentUser=user; ensurePortal();
@@ -112,7 +113,7 @@
     $("setting-name").value=profile.display_name||user.user_metadata?.full_name||"";
     $("setting-theme").value=prefs.theme||"dark"; $("setting-accent").value=prefs.accent||"amber"; $("setting-location").value=prefs.location||"Buseck"; $("setting-density").value=prefs.density||"comfortable";
     applyTheme(); renderFeatureList(); renderModuleSummary(); showPanel("home");
-    loadPersonalWeather();loadPersonalCalendarEvents();
+    loadPersonalWeather();loadPersonalCalendarEvents();loadPersonalBriefing();
     if(!profile.onboarding_completed){step=0;showPanel("setup");}
     const callbackResult=new URLSearchParams(location.search).get("google_calendar");
     if(callbackResult){
@@ -153,7 +154,7 @@
     const moduleResults=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:x.available!==false&&enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const moduleError=moduleResults.find(x=>x.error)?.error;
     if(moduleError){$("setup-description").textContent="Your profile was saved, but feature settings could not be saved: "+moduleError.message;return;}
-    profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");loadPersonalWeather();loadPersonalCalendarEvents();
+    profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");loadPersonalWeather();loadPersonalCalendarEvents();loadPersonalBriefing();
   }
   function renderFeatureList(){
     $("personal-feature-list").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+(x.available===false?' · Coming soon':'')+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(x.available===false?'disabled ':'')+(enabled.has(x.id)?'checked':'')+'></label>').join("");
@@ -256,6 +257,55 @@
     if(error||data?.error){$("google-calendar-status").textContent=error?.message||data?.error||"Could not disconnect.";return;}
     $("google-calendar-status").textContent="Google Calendar disconnected and its stored token deleted.";
     await loadGoogleConnection();loadPersonalCalendarEvents();
+  }
+  async function loadPersonalBriefing(){
+    const panel=$("personal-briefing-content");if(!panel||!currentUser)return;
+    panel.textContent="Putting your day together…";
+    const parts=[];
+    const heading=document.createElement("p");heading.className="personal-briefing-date";
+    heading.textContent=new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+    parts.push(heading);
+    const details=document.createElement("div");details.className="personal-briefing-parts";
+    const weather=document.createElement("section");weather.className="personal-briefing-part";
+    const weatherTitle=document.createElement("b");weatherTitle.textContent="Weather";
+    const weatherCopy=document.createElement("span");
+    if(!enabled.has("weather"))weatherCopy.textContent="Weather is switched off.";
+    else try{
+      const placeName=prefs.location||"Buseck";
+      const geo=await fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(placeName)+"&count=1&language=en&format=json");
+      if(!geo.ok)throw new Error();
+      const place=(await geo.json()).results?.[0];if(!place)throw new Error();
+      const url="https://api.open-meteo.com/v1/forecast?latitude="+encodeURIComponent(place.latitude)+"&longitude="+encodeURIComponent(place.longitude)+"&current=temperature_2m,weather_code,precipitation_probability&timezone=auto";
+      const response=await fetch(url);if(!response.ok)throw new Error();
+      const data=await response.json(),now=data.current;
+      weatherCopy.textContent=now?Math.round(Number(now.temperature_2m))+"° · "+weatherDescription(Number(now.weather_code))+(now.precipitation_probability==null?"":" · "+Math.round(Number(now.precipitation_probability))+"% rain chance"):"Forecast unavailable";
+    }catch{weatherCopy.textContent="Forecast unavailable — check your location or refresh weather.";}
+    weather.append(weatherTitle,weatherCopy);details.append(weather);
+    const agenda=document.createElement("section");agenda.className="personal-briefing-part";
+    const agendaTitle=document.createElement("b");agendaTitle.textContent="Next up";
+    const agendaCopy=document.createElement("span");
+    if(!enabled.has("calendar"))agendaCopy.textContent="Calendar is switched off.";
+    else try{
+      const status=await db.functions.invoke("personal-google-calendar",{body:{action:"status"}});
+      if(status.error||!status.data?.connected)agendaCopy.textContent="Connect your Google Calendar to see what's coming up.";
+      else{
+        const result=await db.functions.invoke("personal-google-calendar",{body:{action:"events"}});
+        if(result.error||result.data?.error)throw new Error();
+        const events=(result.data.events||[]).filter(event=>event.start).sort((a,b)=>new Date(a.start)-new Date(b.start));
+        if(!events.length)agendaCopy.textContent="No events in the next seven days.";
+        else{
+          const event=events[0],start=event.allDay?new Date(event.start+"T00:00:00"):new Date(event.start);
+          const when=start.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+(event.allDay?" · All day":" · "+start.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}));
+          agendaCopy.textContent=(event.summary||"Untitled event")+" · "+when;
+        }
+      }
+    }catch{agendaCopy.textContent="Calendar events couldn't be loaded right now.";}
+    agenda.append(agendaTitle,agendaCopy);details.append(agenda);
+    const school=document.createElement("section");school.className="personal-briefing-part";
+    const schoolTitle=document.createElement("b");schoolTitle.textContent="School";
+    const schoolCopy=document.createElement("span");schoolCopy.textContent="Personal timetable and homework are not connected yet. No administrator data is shown here.";
+    school.append(schoolTitle,schoolCopy);details.append(school);
+    panel.replaceChildren(...parts,details);
   }
   function weatherDescription(code){
     if(code===0)return "Clear sky";

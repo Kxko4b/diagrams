@@ -82,6 +82,7 @@
     $("setup-skip").addEventListener("click",finishSetup);
     $("save-features").addEventListener("click",saveFeatures);
     $("save-settings").addEventListener("click",saveSettings);
+    ["setting-theme","setting-accent","setting-density"].forEach(id=>$(id).addEventListener("change",previewSettings));
     $("delete-account").addEventListener("click",deleteAccount);
   }
   function showPanel(name) {
@@ -137,7 +138,10 @@
     const p=await db.from("user_profiles").upsert({user_id:currentUser.id,display_name:profile.display_name||"",onboarding_completed:true},{onConflict:"user_id"});
     const q=await db.from("user_preferences").upsert({user_id:currentUser.id,preferences:prefs},{onConflict:"user_id"});
     if(p.error||q.error){$("setup-description").textContent="Couldn't save your setup: "+(p.error||q.error).message;return;}
-    await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");
+    const moduleResults=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:x.available!==false&&enabled.has(x.id)},{onConflict:"user_id,module_key"})));
+    const moduleError=moduleResults.find(x=>x.error)?.error;
+    if(moduleError){$("setup-description").textContent="Your profile was saved, but feature settings could not be saved: "+moduleError.message;return;}
+    profile.onboarding_completed=true;$("personal-setup-title").textContent="You're all set";$("personal-setup-copy").textContent="Your personal space is ready. You can revisit setup and settings any time.";applyTheme();renderModuleSummary();showPanel("home");loadPersonalWeather();
   }
   function renderFeatureList(){
     $("personal-feature-list").innerHTML=PERSONAL_MODULES.map(x=>'<label class="personal-feature-row"><span><b>'+x.name+'</b><small>'+x.description+(x.available===false?' · Coming soon':'')+'</small></span><input type="checkbox" data-module="'+x.id+'" '+(x.available===false?'disabled ':'')+(enabled.has(x.id)?'checked':'')+'></label>').join("");
@@ -148,7 +152,7 @@
   async function saveFeatures(showMessage=true){
     const rows=[...document.querySelectorAll("#personal-feature-list [data-module]")];
     rows.forEach(c=>c.checked?enabled.add(c.dataset.module):enabled.delete(c.dataset.module));
-    const result=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:enabled.has(x.id)},{onConflict:"user_id,module_key"})));
+    const result=await Promise.all(PERSONAL_MODULES.map(x=>db.from("user_modules").upsert({user_id:currentUser.id,module_key:x.id,enabled:x.available!==false&&enabled.has(x.id)},{onConflict:"user_id,module_key"})));
     const error=result.find(x=>x.error)?.error;
     $("feature-status").textContent=error?"Couldn't save: "+error.message:"Features saved. Disabled modules keep their data.";
     renderModuleSummary();if(showMessage)showPanel("features");
@@ -161,11 +165,16 @@
       db.from("user_preferences").upsert({user_id:currentUser.id,preferences:prefs},{onConflict:"user_id"})
     ]);
     $("settings-status").textContent=a.error||b.error?"Couldn't save: "+(a.error||b.error).message:"Preferences saved to your account.";
+    if(a.error||b.error)return;
     $("personal-greeting").textContent="Welcome"+(profile.display_name?", "+profile.display_name:"");applyTheme();loadPersonalWeather();
+  }
+  function previewSettings(){
+    prefs={...prefs,theme:$("setting-theme").value,accent:$("setting-accent").value,density:$("setting-density").value};
+    applyTheme();
   }
   function applyTheme(){
     const root=$("personal-app");if(!root)return;
-    root.dataset.theme=prefs.theme||"dark";root.dataset.accent=prefs.accent||"amber";if(root.dataset.theme==="system")root.dataset.theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+    root.dataset.theme=prefs.theme||"dark";root.dataset.accent=prefs.accent||"amber";root.dataset.density=prefs.density||"comfortable";if(root.dataset.theme==="system")root.dataset.theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
   }
   function weatherDescription(code){
     if(code===0)return "Clear sky";

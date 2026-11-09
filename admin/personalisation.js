@@ -17,6 +17,13 @@
   const isAdmin = (user) => user?.email?.toLowerCase() === "haleannson@gmail.com";
   let currentUser = null, prefs = {}, profile = {}, enabled = new Set(), step = 0;
 
+  function installAdminTheme(){
+    const header=document.querySelector("#app .dashboard-header");if(!header||$("admin-theme-toggle"))return;
+    const button=document.createElement("button");button.id="admin-theme-toggle";button.className="personal-theme-toggle";button.type="button";
+    const apply=()=>{const light=localStorage.getItem("kxko-admin-theme")==="light";document.documentElement.dataset.kxTheme=light?"light":"dark";button.textContent=light?"☾ Dark mode":"☼ Light mode";};
+    button.addEventListener("click",()=>{localStorage.setItem("kxko-admin-theme",document.documentElement.dataset.kxTheme==="light"?"dark":"light");apply();});
+    header.append(button);apply();
+  }
   function addAuthControls() {
     const box = document.querySelector(".login-box");
     if (!box || $("personal-signup")) return;
@@ -172,7 +179,7 @@
     await db.auth.signOut();location.reload();
   }
   async function boot(){
-    addAuthControls();ensurePortal();
+    addAuthControls();ensurePortal();installAdminTheme();
     const {data}=await db.auth.getUser();
     if(data?.user&&!isAdmin(data.user))await openPersonalApp(data.user);
   }

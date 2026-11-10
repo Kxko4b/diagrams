@@ -34,11 +34,19 @@ Deno.serve(async (req: Request) => {
 
     const body = await req.json();
     const token = typeof body?.token === "string" ? body.token.trim() : "";
+    const action = body?.action === "unregister" ? "unregister" : "register";
     const platform = typeof body?.platform === "string" ? body.platform : "android";
     if (token.length < 20 || token.length > 4096) return json(400, { success: false, error: "Invalid device token." });
     if (!["android", "ios", "web"].includes(platform)) return json(400, { success: false, error: "Unsupported platform." });
 
     const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    if (action === "unregister") {
+      const { error } = await admin.from("personal_push_devices")
+        .delete().eq("user_id", user.id).eq("fcm_token", token);
+      if (error) throw error;
+      return json(200, { success: true });
+    }
+
     const now = new Date().toISOString();
     const { error } = await admin.from("personal_push_devices").upsert({
       user_id: user.id,

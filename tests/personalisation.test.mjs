@@ -93,10 +93,11 @@ test("homework can be switched on independently of WebUntis", () => {
   assert.match(auth, /This is separate from WebUntis/);
 });
 
-test("native Android and personal portal share sessions without exposing administrator credentials", () => {
+test("native Android and personal portal share sessions without exposing tokens to JavaScript bridge arguments", () => {
   assert.match(auth, /db\.auth\.onAuthStateChange\(\(event, session\)=>/);
-  assert.match(auth, /window\.KxkoNative\.syncSupabaseSession\(session\.access_token,session\.refresh_token\)/);
-  assert.match(auth, /else if\(event==="SIGNED_OUT"\|\|\(session\?\.user&&isAdmin\(session\.user\)\)\)/);
+  assert.match(auth, /window\.KxkoNative\.onPersonalSessionChanged\(\)/);
+  assert.match(auth, /window\.kxkoGetPersonalSession = \(\) =>/);
+  assert.match(auth, /if\(!session\?\.user\|\|isAdmin\(session\.user\)\)return null/);
   assert.match(auth, /window\.kxkoApplyNativeSession = async/);
   assert.match(auth, /db\.auth\.setSession\(\{access_token:accessToken,refresh_token:refreshToken\}\)/);
   assert.match(auth, /if\(isAdmin\(current\?\.user\)\)return false/);

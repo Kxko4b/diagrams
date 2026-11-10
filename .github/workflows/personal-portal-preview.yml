@@ -1,6 +1,8 @@
 name: Personal portal preview
 
 on:
+  push:
+    branches: [feat/personalised-briefing-platform]
   pull_request:
     branches: [main]
     paths:

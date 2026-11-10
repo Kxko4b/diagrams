@@ -499,8 +499,14 @@
     if(error){$("account-status").textContent="Account deletion failed: "+error.message;return;}
     await db.auth.signOut();location.reload();
   }
-  // Native activities use the same Supabase account. Tokens are handed over only through
-  // the trusted Android WebView bridge and remain encrypted by Android Keystore on-device.
+  // The native app reads the active personal session from the main WebView frame on demand.
+  // Tokens are never passed as arguments to a JavaScript interface exposed to every frame.
+  window.kxkoCurrentSession = null;
+  window.kxkoGetPersonalSession = () => {
+    const session = window.kxkoCurrentSession;
+    if(!session?.user||isAdmin(session.user))return null;
+    return {access_token:session.access_token,refresh_token:session.refresh_token};
+  };
   window.kxkoApplyNativeSession = async (accessToken, refreshToken) => {
     if(!accessToken||!refreshToken)return false;
     const {data:current}=await db.auth.getUser();
@@ -518,9 +524,9 @@
       if(event==="PASSWORD_RECOVERY")$("password-recovery-panel")?.classList.remove("hidden");
       // Keep the native study session aligned with the personal portal. Admin credentials
       // remain deliberately isolated from native personal-account features.
-      if(window.KxkoNative?.syncSupabaseSession){
-        if(session?.user&&!isAdmin(session.user))window.KxkoNative.syncSupabaseSession(session.access_token,session.refresh_token);
-        else if(event==="SIGNED_OUT"||(session?.user&&isAdmin(session.user)))window.KxkoNative.clearSupabaseSession?.();
+      window.kxkoCurrentSession = session || null;
+      if(window.KxkoNative?.onPersonalSessionChanged && (session || event==="SIGNED_OUT")){
+        window.KxkoNative.onPersonalSessionChanged();
       }
     });
     const {data}=await db.auth.getUser();

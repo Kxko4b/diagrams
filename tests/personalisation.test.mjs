@@ -103,3 +103,28 @@ test("native Android and personal portal share sessions without exposing tokens 
   assert.match(auth, /if\(isAdmin\(current\?\.user\)\)return false/);
   assert.match(auth, /window\.kxkoClearPersonalSession = async/);
 });
+
+test("personal push registrations are isolated and require a verified account session", () => {
+  const migration = read("supabase/migrations/20261110090000_personal_push_devices.sql");
+  const registration = read("supabase/functions/register-personal-device/index.ts");
+  assert.match(migration, /create table if not exists public\\.personal_push_devices/);
+  assert.match(migration, /user_id uuid not null references auth\\.users\\(id\\) on delete cascade/);
+  assert.match(migration, /enable row level security/);
+  assert.match(migration, /revoke all on table public\\.personal_push_devices from anon, authenticated/);
+  assert.match(registration, /auth\\.getUser\\(\\)/);
+  assert.match(registration, /user_id: user\\.id/);
+  assert.match(registration, /personal_push_devices/);
+  assert.doesNotMatch(registration, /body\\?\\.user_id/);
+  assert.doesNotMatch(registration, /SUPABASE_SERVICE_ROLE_KEY.{0,200}return json/);
+});
+
+test("personal Android push registration is separate from the legacy admin topic", () => {
+  const main = read("app/src/main/java/com/kxko/dailybriefing/MainActivity.kt");
+  const registration = read("app/src/main/java/com/kxko/dailybriefing/PersonalPushRegistration.kt");
+  assert.match(main, /PersonalPushRegistration\\.sync\\(this, access/);
+  assert.match(registration, /functions\\/v1\\/register-personal-device/);
+  assert.match(registration, /Authorization", "Bearer \\$accessToken/);
+  const briefing = read("supabase/functions/daily-briefing/index.ts");
+  assert.match(briefing, /topic: "Kxko-Daily-Briefing"/);
+  assert.doesNotMatch(briefing, /personal_push_devices/);
+});

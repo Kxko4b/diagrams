@@ -520,7 +520,7 @@
       // remain deliberately isolated from native personal-account features.
       if(window.KxkoNative?.syncSupabaseSession){
         if(session?.user&&!isAdmin(session.user))window.KxkoNative.syncSupabaseSession(session.access_token,session.refresh_token);
-        else window.KxkoNative.clearSupabaseSession?.();
+        else if(event==="SIGNED_OUT"||(session?.user&&isAdmin(session.user)))window.KxkoNative.clearSupabaseSession?.();
       }
     });
     const {data}=await db.auth.getUser();

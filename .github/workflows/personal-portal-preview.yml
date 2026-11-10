@@ -6,7 +6,8 @@ on:
     paths:
       - "admin/**"
       - "js/**"
-      - "supabase/migrations/**"\n      - "supabase/functions/register-personal-device/**"\n      - "app/src/main/java/com/kxko/dailybriefing/**"
+      - "supabase/migrations/**"
+      - "supabase/functions/register-personal-device/**"
       - "css/**"
       - "tests/personalisation.test.mjs"
       - "index.html"

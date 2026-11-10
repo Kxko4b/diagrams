@@ -23,7 +23,7 @@ test("personal accounts open a separate portal and load only their own records",
   assert.match(auth, /root\.id="personal-app"/);
   assert.match(auth, /\$\("personal-app"\)\.classList\.remove\("hidden"\)/);
   for (const table of ["user_profiles", "user_preferences", "user_modules"]) {
-    assert.match(auth, new RegExp('db\.from\("' + table + '"\)'));
+    assert.match(auth, new RegExp('db\\.from\\("' + table + '"\\)'));
   }
   assert.match(auth, /\.eq\("user_id",user\.id\)/);
 });

@@ -12,13 +12,14 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="apple-touch-icon" href="../favicon.ico">
 
-    <title>Kxko Admin</title>
+    <title>Kxko Briefing</title>
     <link rel="icon" href="../favicon.ico">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css?v=20261109">
+    <link rel="stylesheet" href="./personalisation.css?v=2">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js?v=20261020b"></script>
@@ -58,8 +59,8 @@
     <div class="login-box">
         <div class="login-logo">K</div>
 
-        <h1>Kxko Admin</h1>
-        <p>Sign in to manage your website.</p>
+        <h1>Kxko Briefing</h1>
+        <p>Your day, organised around what matters.</p>
 
         <input id="admin-email" type="email" placeholder="Email" autocomplete="username">
         <input id="admin-password" type="password" placeholder="Password" autocomplete="current-password">
@@ -720,6 +721,8 @@
     });
 </script>
 
+    <script src="../js/feature-registry.js?v=2"></script>
+    <script src="./personalisation.js?v=4"></script>
     <script>
         if ("serviceWorker" in navigator && location.protocol === "https:") {
             window.addEventListener("load", () => {

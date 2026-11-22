@@ -14,19 +14,21 @@ The agent connects the Samsung M11 **outbound** to the Kxko Admin dashboard thro
 ## Install on the M11
 
 1. Ensure Node.js is installed in Termux.
-2. Clone or pull this repository, then open its server folder.
-3. Install the pinned dependency: `npm install --no-save @supabase/supabase-js@2.119.0`
-4. Create a local `.env` file:
+2. Clone or pull this repository into `~/server/projects/diagrams`.
+3. Copy `server/m11-agent.mjs` into `~/server/services/mcp/` so the agent remains installed independently of the project checkout.
+4. In `~/server/services/mcp/`, install the pinned dependency: `npm install @supabase/supabase-js@2.119.0`
+5. Create `~/server/services/mcp/.env` locally (not in the repository):
    ```env
    SUPABASE_URL=https://ggewdpazpeoielbqrcgm.supabase.co
    SUPABASE_SECRET_KEY=sb_secret_REPLACE_WITH_A_SERVER_ONLY_KEY
    ```
-5. Create a server-only secret key in Supabase project settings. Keep it in Termux only; never paste it into chat, GitHub, or the dashboard.
-6. Restrict the file: `chmod 600 .env`
-7. Test: `node --env-file=.env m11-agent.mjs`
-8. Once the dashboard shows the M11 online, keep it running with PM2:
+6. Create a server-only secret key in Supabase project settings. Keep it in Termux only; never paste it into chat, GitHub, or the dashboard.
+7. Restrict the file: `chmod 600 .env`
+8. Test: `node --env-file=.env m11-agent.mjs`
+9. Once the dashboard shows the M11 online, keep it running with PM2:
    `pm2 start m11-agent.mjs --name kxko-m11-agent --node-args="--env-file=.env"`
    `pm2 save`
+10. For automatic startup after a phone reboot, add `sleep 10; pm2 resurrect` to the existing Termux:Boot `start-services` script.
 
 If the phone is lost or reset, revoke the server secret key.
 

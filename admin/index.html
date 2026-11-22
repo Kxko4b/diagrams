@@ -20,6 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css?v=20261109">
     <link rel="stylesheet" href="./personalisation.css?v=2">
+    <link rel="stylesheet" href="./server-manager.css?v=1">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js?v=20261020b"></script>
@@ -391,6 +392,13 @@
             <span>Return to your requests, activity and business summary.</span>
             <b>Open overview <span aria-hidden="true">→</span></b>
         </button>
+
+        <button class="more-tool-card server-tool-card" type="button" onclick="showAdminView('server')">
+            <span class="more-tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"/></svg></span>
+            <strong>M11 Server Manager</strong>
+            <span>Monitor your phone server, manage processes and use SuperShell.</span>
+            <b>Open server <span aria-hidden="true">→</span></b>
+        </button>
         <button class="more-tool-card" type="button" onclick="showAdminView('kxkos')">
             <span class="more-tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 8h18M7 6h.01M10 6h.01M7 12l3 2-3 2m5 0h3"/></svg></span>
             <strong>KXKOS</strong>
@@ -426,6 +434,33 @@
         </div>
     </section>
 </section>
+
+            <section id="server-view" class="view server-view">
+                <div class="page-header server-page-head">
+                    <div><span class="server-eyebrow">REMOTE DEVICE · TERMUX</span><h2>M11 Server Manager</h2><p>Monitor and manage your Samsung M11 from this dashboard.</p></div>
+                    <div class="server-connection-pill" id="m11-connection-pill"><span class="server-connection-dot"></span><span id="m11-connection-label">Connecting…</span></div>
+                </div>
+                <div class="server-overview-grid">
+                    <article class="server-stat-card server-device-card"><div class="server-card-top"><span>DEVICE</span><span id="m11-live-label">WAITING</span></div><strong id="m11-device-name">Kxko M11</strong><p id="m11-device-meta">Waiting for the phone to connect.</p><div class="server-device-foot"><span>Last seen</span><b id="m11-last-seen">—</b></div></article>
+                    <article class="server-stat-card"><div class="server-card-top"><span>MEMORY</span><span>RAM</span></div><strong id="m11-memory">—</strong><div class="server-meter"><span id="m11-memory-bar"></span></div><p id="m11-memory-detail">Waiting for server metrics</p></article>
+                    <article class="server-stat-card"><div class="server-card-top"><span>UPTIME</span><span>ANDROID</span></div><strong id="m11-uptime">—</strong><p id="m11-system-detail">Node.js · Termux</p><button class="server-text-button" type="button" data-server-action="status">Refresh status ↻</button></article>
+                </div>
+                <div class="server-section-heading"><div><span class="server-eyebrow">CONTROL CENTRE</span><h3>Server tools</h3></div><span class="server-muted">Actions run on your M11</span></div>
+                <div class="server-tools-grid">
+                    <article class="server-panel"><div class="server-panel-heading"><div><span class="server-panel-icon">▤</span><h3>Process manager</h3></div><button class="server-icon-button" type="button" data-server-action="processes">↻</button></div><p class="server-muted">View and restart services managed by PM2.</p><div id="m11-process-list" class="server-process-list"><p class="server-empty">Waiting for the M11…</p></div></article>
+                    <article class="server-panel"><div class="server-panel-heading"><div><span class="server-panel-icon">⌘</span><h3>GitHub projects</h3></div><button class="server-icon-button" type="button" data-server-action="projects">↻</button></div><p class="server-muted">Your managed repositories in ~/server/projects.</p><div id="m11-project-list" class="server-project-list"><p class="server-empty">Waiting for the M11…</p></div></article>
+                </div>
+                <article class="server-panel server-terminal-panel">
+                    <div class="server-panel-heading server-terminal-heading"><div><span class="server-panel-icon">›_</span><h3>SuperShell</h3><span class="server-terminal-tag">M11 · TERMUX</span></div><button class="server-icon-button" type="button" id="m11-clear-terminal">Clear</button></div>
+                    <p class="server-muted">A PowerShell-style control console for your Android server. Commands run in Termux, not Windows PowerShell. Only supported commands are enabled.</p>
+                    <div class="server-command-chips"><button type="button" data-server-command="status">status</button><button type="button" data-server-command="projects">projects</button><button type="button" data-server-command="pm2 list">pm2 list</button><button type="button" data-server-command="df">disk</button><button type="button" data-server-command="help">help</button></div>
+                    <div id="m11-terminal-output" class="server-terminal-output" role="log" aria-live="polite"><div class="server-terminal-welcome">KXKO M11 SUPERSHELL · READY WHEN SERVER CONNECTS<br>Type <b>help</b> to see supported commands.</div></div>
+                    <form id="m11-terminal-form" class="server-terminal-form"><label for="m11-terminal-input">m11 ›</label><input id="m11-terminal-input" type="text" autocomplete="off" spellcheck="false" placeholder="Enter a command…" maxlength="240" disabled><button class="primary" type="submit" id="m11-terminal-run" disabled>Run</button></form>
+                    <div class="server-terminal-foot"><span id="m11-terminal-hint">Connect the M11 agent to enable commands.</span><span>Command history: ↑ / ↓</span></div>
+                </article>
+                <div class="server-security-note"><span aria-hidden="true">◇</span><p><strong>Protected connection.</strong> The dashboard uses your signed-in admin session and a private Supabase Realtime channel. The phone initiates the outbound connection; no public shell port is opened. SuperShell does not expose unrestricted root or arbitrary shell execution.</p></div>
+            </section>
+
             <!-- DAILY BRIEFING -->
 
             <section id="briefing-view" class="view">
@@ -554,6 +589,7 @@
 <script src="../js/content-admin.js?v=20261027a"></script>
 <script src="../js/briefing-settings-admin.js?v=20261106a"></script>
 <script src="../js/admin.js?v=20261109a"></script>
+<script src="./server-manager.js?v=1"></script>
 <script src="../js/questions-admin.js?v=20261020b"></script>
 <script src="../js/earnings-admin.js?v=20261021d"></script>
 <script src="../js/requests-admin.js?v=20261021d"></script>
@@ -697,14 +733,15 @@
         const actualView = document.getElementById(view + "-view") ? view : "overview";
         document.querySelectorAll(".view").forEach(element => element.classList.remove("active"));
         document.getElementById(actualView + "-view")?.classList.add("active");
-        const mainTab = ["overview","weather","briefing","business","more"].includes(actualView) ? actualView : (actualView === "kxkos" ? "more" : "business");
+        const mainTab = ["overview","weather","briefing","business","more"].includes(actualView) ? actualView : (["kxkos","server"].includes(actualView) ? "more" : "business");
         document.querySelectorAll(".nav-button[data-view]").forEach(button => button.classList.toggle("active", button.dataset.view === mainTab));
         const title = document.querySelector(".header-title");
-        if (title) title.textContent = ({overview:"Overview",weather:"Weather",briefing:"Briefing",business:"Business",more:"More",requests:"Business / Requests",questions:"Business / Questions",reviews:"Business / Reviews",examples:"Business / Examples",content:"Business / Website content",kxkos:"More / KXKOS"})[actualView] || "Kxko Admin";
+        if (title) title.textContent = ({overview:"Overview",weather:"Weather",briefing:"Briefing",business:"Business",more:"More",requests:"Business / Requests",questions:"Business / Questions",reviews:"Business / Reviews",examples:"Business / Examples",content:"Business / Website content",kxkos:"More / KXKOS",server:"More / M11 Server Manager"})[actualView] || "Kxko Admin";
         if (actualView === "more" && typeof loadMoreAccount === "function") loadMoreAccount();
         if (actualView === "more" && typeof window.loadBriefingSettings === "function") window.loadBriefingSettings();
         window.scrollTo({top:0,behavior:"smooth"});
         if (actualView === "briefing" && typeof loadLiveBriefing === "function") loadLiveBriefing();
+        if (actualView === "server" && typeof window.loadServerManager === "function") window.loadServerManager();
     }
 
     function syncBusinessSnapshot(){[["stat-total-requests","business-total"],["stat-pending","business-pending"],["stat-progress","business-progress"]].forEach(([from,to])=>{const s=document.getElementById(from),t=document.getElementById(to);if(s&&t)t.textContent=s.textContent;});}

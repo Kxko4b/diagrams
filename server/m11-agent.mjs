@@ -38,7 +38,12 @@ async function run(program, args, timeout = 15000) {
   const result = await execFile(program, args, { timeout, maxBuffer: 1024 * 1024, windowsHide: true });
   return clip(result.stdout + (result.stderr ? "\n" + result.stderr : ""));
 }
+function isSensitivePath(relative) {
+  const parts = String(relative || "").split(/[\\/]+/).filter(Boolean).map(x => x.toLowerCase());
+  return parts.some(name => name === ".env" || name === ".ssh" || name === "authorized_keys" || name === "hosts.yml" || name.includes("secret") || name.includes("token") || name.endsWith(".pem") || name.endsWith(".key"));
+}
 async function safePath(relative = ".") {
+  if (isSensitivePath(relative)) throw new Error("Access to credential and secret files is blocked.");
   const target = path.resolve(ROOT, relative || ".");
   if (target !== ROOT && !target.startsWith(ROOT + path.sep)) throw new Error("Path is outside ~/server.");
   const rootReal = await fs.realpath(ROOT);
@@ -147,7 +152,7 @@ async function terminal(line) {
   if (head === "files" && parts.length <= 2) {
     const dir = await safePath(sub || ".");
     const entries = await fs.readdir(dir, { withFileTypes: true });
-    return entries.slice(0, 150).map(x => (x.isDirectory() ? "[DIR] " : "      ") + x.name).join("\n") || "(empty)";
+    return entries.filter(x => !isSensitivePath(x.name)).slice(0, 150).map(x => (x.isDirectory() ? "[DIR] " : "      ") + x.name).join("\n") || "(empty)";
   }
   if (head === "read" && parts.length === 2) {
     const file = await safePath(sub);

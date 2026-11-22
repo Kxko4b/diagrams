@@ -41,7 +41,10 @@ async function run(program, args, timeout = 15000) {
 async function safePath(relative = ".") {
   const target = path.resolve(ROOT, relative || ".");
   if (target !== ROOT && !target.startsWith(ROOT + path.sep)) throw new Error("Path is outside ~/server.");
-  return target;
+  const rootReal = await fs.realpath(ROOT);
+  const real = await fs.realpath(target);
+  if (real !== rootReal && !real.startsWith(rootReal + path.sep)) throw new Error("Path resolves outside ~/server.");
+  return real;
 }
 async function deviceInfo() {
   let model = "Samsung Galaxy M11";
@@ -158,7 +161,7 @@ async function handle(payload = {}) {
   const id = payload.id || "unknown", action = payload.action;
   try {
     const result = { id, action, output: "Done." };
-    if (action === "ping") result.output = "M11 agent is online.";
+    if (action === "ping") { result.output = "M11 agent is online."; result.heartbeat = await deviceInfo(); }
     else if (action === "status") { result.heartbeat = await deviceInfo(); result.output = "Server status refreshed."; }
     else if (action === "processes") { result.data = await listProcesses(); result.output = "Loaded " + result.data.length + " PM2 process(es)."; }
     else if (action === "projects") { result.data = await listProjects(); result.output = "Loaded " + result.data.length + " approved project(s)."; }

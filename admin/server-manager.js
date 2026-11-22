@@ -35,7 +35,8 @@
     });
   }
   function heartbeat(data={}){
-    online=true;lastHeartbeat=Date.now();connection("online","M11 online");
+    const firstConnection=!online;online=true;lastHeartbeat=Date.now();connection("online","M11 online");
+    if(firstConnection&&channelReady){setTimeout(()=>{refreshProcesses().catch(()=>{});refreshProjects().catch(()=>{});},250);}
     if($("m11-device-name"))$("m11-device-name").textContent=data.device||"Kxko M11";
     if($("m11-device-meta"))$("m11-device-meta").textContent=[data.platform,data.model,data.node].filter(Boolean).join(" · ")||"Android · Termux";
     if($("m11-last-seen"))$("m11-last-seen").textContent="Just now";
